@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 import { ADMIN_COOKIE_NAME, isAdminConfigured, isValidAdminSession } from "@/lib/admin-auth";
+import { sendWhatsAppStatusUpdate } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -72,15 +73,56 @@ export async function PATCH(request: Request) {
     client = new MongoClient(databaseUri(), { serverSelectionTimeoutMS: 5000 });
     await client.connect();
     const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
-    const result = await db.collection("orders").updateOne(
+    const orders = db.collection("orders");
+    const existing = await orders.findOne({ orderId: body.orderId }, {
+      projection: { _id: 0, orderId: 1, status: 1, customer: 1 },
+    });
+    if (!existing) return NextResponse.json({ error: "या order ID ची ऑर्डर सापडली नाही." }, { status: 404 });
+
+    if (existing.status === body.status) {
+      return NextResponse.json({
+        ok: true,
+        orderId: body.orderId,
+        status: body.status,
+        notification: { state: "not_sent", reason: "status_unchanged" },
+      });
+    }
+
+    const changedAt = new Date();
+    const result = await orders.updateOne(
       { orderId: body.orderId },
       {
-        $set: { status: body.status, updatedAt: new Date() },
-        $push: { statusHistory: { status: body.status, changedAt: new Date() } },
+        $set: { status: body.status, updatedAt: changedAt },
+        $push: { statusHistory: { status: body.status, changedAt } },
       } as any,
     );
     if (result.matchedCount === 0) return NextResponse.json({ error: "या order ID ची ऑर्डर सापडली नाही." }, { status: 404 });
-    return NextResponse.json({ ok: true, orderId: body.orderId, status: body.status });
+
+    let notification: { state: string; messageId?: string; errorCode?: string; reason?: string };
+    const customer = existing.customer as { name?: string; phone?: string; whatsappOptIn?: boolean } | undefined;
+    if (customer?.whatsappOptIn !== true) {
+      notification = { state: "skipped_opt_out", reason: "customer_has_not_opted_in" };
+    } else if (!customer.phone) {
+      notification = { state: "failed", errorCode: "MISSING_PHONE" };
+    } else {
+      const sendResult = await sendWhatsAppStatusUpdate({
+        phone: customer.phone,
+        customerName: customer.name || "Customer",
+        orderId: String(body.orderId),
+        status: String(body.status),
+      });
+      notification = {
+        state: sendResult.state,
+        ...("messageId" in sendResult && sendResult.messageId ? { messageId: sendResult.messageId } : {}),
+        ...("errorCode" in sendResult && sendResult.errorCode ? { errorCode: sendResult.errorCode } : {}),
+      };
+    }
+
+    await orders.updateOne(
+      { orderId: body.orderId },
+      { $push: { notificationHistory: { channel: "whatsapp", status: body.status, ...notification, attemptedAt: new Date() } } } as any,
+    );
+    return NextResponse.json({ ok: true, orderId: body.orderId, status: body.status, notification });
   } catch (error) {
     console.error("Admin order update failed", error);
     return NextResponse.json({ error: "Order status बदलता आला नाही. Database तपासा." }, { status: 503 });

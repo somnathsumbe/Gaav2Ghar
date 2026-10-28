@@ -16,7 +16,8 @@ type Order = {
   status?: string;
   createdAt?: string;
   updatedAt?: string;
-  customer?: { name?: string; phone?: string; address?: string };
+  customer?: { name?: string; phone?: string; address?: string; location?: { latitude?: number; longitude?: number } | null; whatsappOptIn?: boolean };
+  notificationHistory?: Array<{ channel?: string; status?: string; state?: string; attemptedAt?: string; errorCode?: string }>;
   items?: OrderItem[];
   subtotal?: number;
   deliveryCharge?: number;
@@ -95,7 +96,17 @@ export default function AdminPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Status update झाले नाही.");
       setOrders((old) => old.map((order) => order.orderId === orderId ? { ...order, status } : order));
-      setMessage("ऑर्डर " + orderId + " चा status अपडेट झाला.");
+      const notificationState = data.notification?.state;
+      const notificationText = notificationState === "accepted"
+        ? " WhatsApp मेसेज Meta API ने स्वीकारला."
+        : notificationState === "failed"
+          ? " WhatsApp मेसेज पाठवता आला नाही (" + (data.notification?.errorCode || "unknown") + ")."
+          : notificationState === "not_configured"
+            ? " WhatsApp API सेटअप बाकी आहे."
+            : notificationState === "skipped_opt_out"
+              ? " ग्राहकाची WhatsApp संमती नाही; मेसेज पाठवला नाही."
+              : "";
+      setMessage("ऑर्डर " + orderId + " चा status अपडेट झाला." + notificationText);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Status update झाले नाही.");
     }
@@ -169,6 +180,8 @@ export default function AdminPage() {
                         <p className="detail"><strong>{t("ग्राहक:")}</strong> {order.customer?.name || "—"}</p>
                         <p className="detail"><strong>मोबाईल:</strong> {order.customer?.phone || "—"}</p>
                         <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>
+                        {order.customer?.location && Number.isFinite(order.customer.location.latitude) && Number.isFinite(order.customer.location.longitude) && <p className="detail">📍 <a href={"https://www.google.com/maps/dir/?api=1&destination=" + order.customer.location.latitude + "," + order.customer.location.longitude} target="_blank" rel="noreferrer" style={{ color: "#1f5b3b", fontWeight: 700 }}>Google Maps मध्ये नेव्हिगेट करा</a></p>}
+                        <p className="detail"><strong>WhatsApp संमती:</strong> {order.customer?.whatsappOptIn ? "होय" : "नाही"}</p>
                         <p className="detail"><strong>{t("ऑर्डर वेळ:")}</strong> {date(order.createdAt)}</p>
                         <ul className="items">{(order.items || []).map((item, index) => <li key={index}>{item.product || "धान्य"} — {item.variety || "—"}; {item.bagSizeKg || 0} किलो × {item.bags || 0} बॅग = {item.quantityKg || (Number(item.bagSizeKg) * Number(item.bags)) || 0} किलो</li>)}</ul>
                         <p className="detail">Payment: {order.paymentMethod || "COD"} • Delivery: {money(order.deliveryCharge)}</p>
