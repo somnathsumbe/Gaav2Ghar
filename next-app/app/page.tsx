@@ -25,6 +25,7 @@ const bagSizes = [5, 25, 50, 100];
 type BasketItem = { key: string; product: Product; variety: string; bagSize: number; bags: number };
 
 export default function Home() {
+  const { language, t } = useAppLanguage();
   const [products, setProducts] = useState<Product[]>(defaultProducts);
   useEffect(() => {
     let active = true;
