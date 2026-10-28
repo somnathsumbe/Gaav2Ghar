@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Product = {
   id: string;
@@ -12,7 +12,7 @@ type Product = {
   emoji: string;
 };
 
-const products: Product[] = [
+const defaultProducts: Product[] = [
   { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "शरबती", "बन्सी"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
   { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["इंद्रायणी", "कोलम", "आंबेमोहोर"], pricePerKg: 58, note: "घरच्या जेवणाची चव", emoji: "🍚" },
   { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
@@ -24,6 +24,15 @@ const bagSizes = [5, 25, 50, 100];
 type BasketItem = { key: string; product: Product; variety: string; bagSize: number; bags: number };
 
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/products", { cache: "no-store" }).then(async (response) => {
+      const data = await response.json();
+      if (response.ok && active && Array.isArray(data.products) && data.products.length) setProducts(data.products);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, []);
   const [selected, setSelected] = useState<Record<string, string>>({ wheat: "लोकवन", rice: "इंद्रायणी", jowar: "पांढरी ज्वारी", "toor-dal": "निवडक तूर डाळ" });
   const [sizes, setSizes] = useState<Record<string, number>>({ wheat: 5, rice: 5, jowar: 5, "toor-dal": 5 });
   const [basket, setBasket] = useState<BasketItem[]>([]);
@@ -89,6 +98,7 @@ export default function Home() {
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
           <a className="basket-link" href="#basket">🧺 बास्केट <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
+          <a className="basket-link" href="/track">📦 ऑर्डर ट्रॅक करा</a>
         </div>
       </header>
 
@@ -102,7 +112,7 @@ export default function Home() {
       <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>निवडक धान्य</strong><small>विविध पारंपरिक वाण</small></p></div><div><span>⚖️</span><p><strong>तुमच्या गरजेनुसार</strong><small>5 ते 100 किलो बॅग</small></p></div><div><span>🏡</span><p><strong>घरपोच सेवा</strong><small>पत्त्यानुसार पुष्टी</small></p></div></div></section>
 
       <section className="section container" id="products"><div className="section-heading"><div><span className="eyebrow">आमची निवड</span><h2>घरासाठी चांगले धान्य</h2><p>वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.</p></div><span className="product-count">{products.length} उत्पादने</span></div>
-        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><span className="product-emoji">{product.emoji}</span><span className="quality-tag">निवडक धान्य</span></div><div className="product-content"><div className="product-title"><div><h3>{product.name}</h3><span>{product.english}</span></div><div className="price"><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></div></div><p className="product-note">{product.note}</p><label htmlFor={"variety-" + product.id}>वाण निवडा</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety}>{variety}</option>)}</select><label htmlFor={"size-" + product.id}>बॅगचे वजन</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} किलो</option>)}</select><div className="card-footer"><span>₹{product.pricePerKg * sizes[product.id]} <small>/ बॅग</small></span><button className="add-button" onClick={() => addToBasket(product)}>＋ जोडा</button></div></div></article>)}</div>
+        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><span className="product-emoji">{product.emoji}</span><span className="quality-tag">निवडक धान्य</span></div><div className="product-content"><div className="product-title"><div><h3>{product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>किंमत निश्चित करायची</small>}</div></div><p className="product-note">{product.note}</p><label htmlFor={"variety-" + product.id}>वाण निवडा</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety}>{variety}</option>)}</select><label htmlFor={"size-" + product.id}>बॅगचे वजन</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} किलो</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>किंमत लवकरच</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा" : "किंमत बाकी"}</button></div></div></article>)}</div>
       </section>
 
       <section className="basket-section" id="basket"><div className="container basket-layout"><div><span className="eyebrow">तुमची खरेदी</span><h2>तुमची बास्केट</h2><p className="muted">बॅगची संख्या + / − करून बदलू शकता.</p>{basket.length === 0 ? <div className="empty-basket"><span>🧺</span><strong>तुमची बास्केट रिकामी आहे</strong><p>आवडते धान्य निवडून बास्केटमध्ये जोडा.</p><a href="#products">धान्य पाहा →</a></div> : <div className="basket-items">{basket.map((item) => <div className="basket-item" key={item.key}><div className="mini-grain">{item.product.emoji}</div><div className="basket-item-info"><strong>{item.product.name} — {item.variety}</strong><small>{item.bagSize} किलो बॅग · ₹{item.product.pricePerKg}/किलो</small><b>₹{item.bagSize * item.bags * item.product.pricePerKg}</b></div><div className="stepper"><button aria-label="कमी करा" onClick={() => changeBags(item.key, -1)}>−</button><span>{item.bags}</span><button aria-label="वाढवा" onClick={() => changeBags(item.key, 1)}>＋</button></div></div>)}</div>}</div>
