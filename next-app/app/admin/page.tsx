@@ -35,6 +35,7 @@ const money = (value?: number) => "₹" + (Number.isFinite(value) ? Number(value
 const date = (value?: string) => value ? new Date(value).toLocaleString("en-IN") : "—";
 
 export default function AdminPage() {
+  const { t } = useAppLanguage();
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
