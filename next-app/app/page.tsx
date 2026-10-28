@@ -23,6 +23,7 @@ const defaultProducts: Product[] = [
 const bagSizes = [5, 25, 50, 100];
 
 type BasketItem = { key: string; product: Product; variety: string; bagSize: number; bags: number };
+type DeliveryLocation = { latitude: number; longitude: number; accuracy?: number };
 
 export default function Home() {
   const { language, t } = useAppLanguage();
@@ -40,7 +41,9 @@ export default function Home() {
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [notice, setNotice] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
+  const [customer, setCustomer] = useState<{ name: string; phone: string; address: string; location: DeliveryLocation | null; whatsappOptIn: boolean }>({ name: "", phone: "", address: "", location: null, whatsappOptIn: false });
+  const [locationBusy, setLocationBusy] = useState(false);
+  const [locationMessage, setLocationMessage] = useState("");
   const [sending, setSending] = useState(false);
 
   const totalKg = useMemo(() => basket.reduce((sum, item) => sum + item.bagSize * item.bags, 0), [basket]);
@@ -64,6 +67,27 @@ export default function Home() {
     setBasket((old) => old.map((item) => item.key === key ? { ...item, bags: item.bags + delta } : item).filter((item) => item.bags > 0));
   }
 
+  function useCurrentLocation() {
+    setLocationMessage("");
+    if (!navigator.geolocation) {
+      setLocationMessage(t("या ब्राउझरमध्ये GPS उपलब्ध नाही. पत्ता मॅन्युअली भरा."));
+      return;
+    }
+    setLocationBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCustomer((current) => ({ ...current, location: { latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy } }));
+        setLocationMessage(t("लोकेशन निवडले आहे."));
+        setLocationBusy(false);
+      },
+      () => {
+        setLocationMessage(t("लोकेशन मिळाले नाही. Browser permission तपासा किंवा पत्ता मॅन्युअली भरा."));
+        setLocationBusy(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 },
+    );
+  }
+
   async function placeOrder() {
     if (!customer.name.trim() || !/^[6-9]\d{9}$/.test(customer.phone) || !customer.address.trim() || basket.length === 0) {
       setNotice(t("कृपया नाव, योग्य 10 अंकी मोबाईल नंबर, पत्ता आणि बास्केट तपासा."));
@@ -85,7 +109,7 @@ export default function Home() {
       setNotice(t("धन्यवाद! ऑर्डर नोंदवली. ऑर्डर क्रमांक: ") + data.orderId + t(". फोनवरून पुष्टी केली जाईल."));
       setBasket([]);
       setCheckoutOpen(false);
-      setCustomer({ name: "", phone: "", address: "" });
+      setCustomer({ name: "", phone: "", address: "", location: null, whatsappOptIn: false });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : t("काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा."));
     } finally {
@@ -119,7 +143,9 @@ export default function Home() {
 
       <section className="basket-section" id="basket"><div className="container basket-layout"><div><span className="eyebrow">{t("तुमची खरेदी")}</span><h2>{t("तुमची बास्केट")}</h2><p className="muted">{t("बॅगची संख्या + / − करून बदलू शकता.")}</p>{basket.length === 0 ? <div className="empty-basket"><span>🧺</span><strong>{t("तुमची बास्केट रिकामी आहे")}</strong><p>{t("आवडते धान्य निवडून बास्केटमध्ये जोडा.")}</p><a href="#products">{t("धान्य पाहा")} →</a></div> : <div className="basket-items">{basket.map((item) => <div className="basket-item" key={item.key}><div className="mini-grain">{item.product.emoji}</div><div className="basket-item-info"><strong>{language === "en" ? item.product.english : language === "hi" ? t(item.product.name) : item.product.name} — {item.variety}</strong><small>{item.bagSize} किलो बॅग · ₹{item.product.pricePerKg}/किलो</small><b>₹{item.bagSize * item.bags * item.product.pricePerKg}</b></div><div className="stepper"><button aria-label={t("कमी करा")} onClick={() => changeBags(item.key, -1)}>−</button><span>{item.bags}</span><button aria-label={t("वाढवा")} onClick={() => changeBags(item.key, 1)}>＋</button></div></div>)}</div>}</div>
         <aside className="summary-card"><h3>{t("ऑर्डरचा तपशील")}</h3><div className="summary-line"><span>{t("एकूण वजन")}</span><strong>{totalKg} किलो</strong></div><div className="summary-line"><span>{t("धान्याची किंमत")}</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div className="summary-line"><span>{t("डिलिव्हरी")}</span><strong>{delivery === 0 ? "₹0" : "₹" + delivery}</strong></div><div className="summary-line total-line"><span>{t("एकूण रक्कम")}</span><strong>₹{total.toLocaleString("en-IN")}</strong></div><p className="summary-note">{t("₹1,500 किंवा अधिक खरेदीवर अंदाजित मोफत डिलिव्हरी. अंतिम शुल्क फोनवर कळवले जाईल.")}</p><button className="primary-button full-button" disabled={!basket.length} onClick={() => setCheckoutOpen(!checkoutOpen)}>{checkoutOpen ? t("फॉर्म बंद करा") : t("ऑर्डर पुढे न्या")} →</button>
-          {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">{t("तुमचे नाव")}</label><input id="customer-name" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder={t("पूर्ण नाव")} /><label htmlFor="customer-phone">{t("मोबाईल नंबर")}</label><input id="customer-phone" inputMode="numeric" maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder={t("10 अंकी नंबर")} /><label htmlFor="customer-address">{t("पूर्ण पत्ता")}</label><textarea id="customer-address" rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder={t("घर क्रमांक, परिसर, शहर, पिनकोड")} /><p className="cod-note">{t("पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.")}</p><button className="primary-button full-button" disabled={sending} onClick={placeOrder}>{sending ? t("ऑर्डर नोंदवत आहे...") : t("ऑर्डर निश्चित करा")}</button></div>}
+          {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">{t("तुमचे नाव")}</label><input id="customer-name" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder={t("पूर्ण नाव")} /><label htmlFor="customer-phone">{t("मोबाईल नंबर")}</label><input id="customer-phone" inputMode="numeric" maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder={t("10 अंकी नंबर")} /><label htmlFor="customer-address">{t("पूर्ण पत्ता")}</label><textarea id="customer-address" rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder={t("घर क्रमांक, परिसर, शहर, पिनकोड")} />
+            <div className="location-picker"><button type="button" className="secondary-button" onClick={useCurrentLocation} disabled={locationBusy}>{locationBusy ? t("लोकेशन मिळवत आहे...") : customer.location ? t("लोकेशन निवडले ✓") : t("📍 माझे GPS लोकेशन वापरा")}</button>{customer.location && <p className="location-detail">📍 {customer.location.latitude.toFixed(6)}, {customer.location.longitude.toFixed(6)} <a href={"https://www.google.com/maps?q=" + customer.location.latitude + "," + customer.location.longitude} target="_blank" rel="noreferrer">{t("नकाशावर पाहा")}</a></p>}{locationMessage && <p className="location-detail" role="status">{locationMessage}</p>}<p className="location-hint">{t("GPS साठी परवानगी द्या. लोकेशन न दिल्यास पूर्ण पत्ता वापरता येईल.")}</p></div>
+            <label className="whatsapp-optin"><input type="checkbox" checked={customer.whatsappOptIn} onChange={(e) => setCustomer({ ...customer, whatsappOptIn: e.target.checked })} /> <span>{t("ऑर्डर स्टेटसचे WhatsApp अपडेट मिळवण्यास माझी संमती आहे.")}</span></label><p className="cod-note">{t("पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.")}</p><button className="primary-button full-button" disabled={sending} onClick={placeOrder}>{sending ? t("ऑर्डर नोंदवत आहे...") : t("ऑर्डर निश्चित करा")}</button></div>}
         </aside></div></section>
       <footer className="footer"><div className="container footer-inner"><a className="brand footer-brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo footer-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a><p>{t("शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.")}</p><small>© {new Date().getFullYear()} Gaav2Ghar. सर्व हक्क राखीव.</small></div></footer>
       <nav className="mobile-bottom-nav" aria-label="मुख्य नेव्हिगेशन">
