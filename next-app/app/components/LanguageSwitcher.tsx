@@ -126,11 +126,8 @@ const dictionary: Record<string, Record<AppLanguage, string>> = {
   "घरच्या जेवणाची चव": { mr: "घरच्या जेवणाची चव", hi: "घर के खाने का स्वाद", en: "Taste of home-cooked meals" },
   "पारंपरिक आणि पौष्टिक": { mr: "पारंपरिक आणि पौष्टिक", hi: "पारंपरिक और पौष्टिक", en: "Traditional and nutritious" },
   "निवडक दर्जा": { mr: "निवडक दर्जा", hi: "चुनी हुई गुणवत्ता", en: "Selected quality" },
-  "नवीन उत्पादन": { mr: "नवीन उत्पादन", hi: "नया उत्पाद", en: "New product" },
-  "वाण (comma ने वेगळे करा)": { mr: "वाण (comma ने वेगळे करा)", hi: "किस्में (कॉमा से अलग करें)", en: "Varieties (comma-separated)" },
   "कमी करा": { mr: "कमी करा", hi: "कम करें", en: "Decrease" },
   "वाढवा": { mr: "वाढवा", hi: "बढ़ाएँ", en: "Increase" },
-  "पॅक केले": { mr: "पॅक केले", hi: "पैक किया गया", en: "Packed" },
 
   "ऑर्डर": { mr: "ऑर्डर", hi: "ऑर्डर", en: "Order" },
 };
