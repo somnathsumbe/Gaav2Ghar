@@ -7,6 +7,7 @@ type Product = { id: string; name: string; english: string; varieties: string[];
 const blank: Product = { id: "", name: "", english: "", varieties: [], pricePerKg: 0, note: "", emoji: "🌾", active: true };
 
 export default function AdminProductsPage() {
+  const { t } = useAppLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [form, setForm] = useState<Product>(blank);
   const [varietyText, setVarietyText] = useState("");
