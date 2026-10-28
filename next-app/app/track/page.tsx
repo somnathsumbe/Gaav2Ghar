@@ -54,12 +54,12 @@ export default function TrackPage() {
       <div className="container" style={{ maxWidth: 760, margin: "0 auto" }}>
         <div className="d-flex justify-content-between align-items-center flex-wrap gap-3"><a href="/" style={{ color: "#1f5b3b", fontWeight: 700 }}>← Gaav2Ghar Home</a><LanguageSwitcher /></div>
         <section style={{ marginTop: 24, background: "#fff", border: "1px solid #e5e7dc", borderRadius: 18, padding: 24 }}>
-          <p style={{ color: "#647164", marginBottom: 4 }}>Gaav2Ghar • Order Tracking</p>
+          <p style={{ color: "#647164", marginBottom: 4 }}>Gaav2Ghar • {t("Order Tracking")}</p>
           <h1 style={{ marginTop: 0 }}>{t("तुमची ऑर्डर कुठपर्यंत आली?")}</h1>
           <p>{t("ऑर्डरची पुष्टी झाल्यानंतर मिळालेला order ID आणि ऑर्डर देताना वापरलेला मोबाईल नंबर टाका.")}</p>
           <form onSubmit={track}>
-            <label htmlFor="track-order" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>Order ID</label>
-            <input id="track-order" value={orderId} onChange={(e) => setOrderId(e.target.value.toUpperCase())} placeholder="उदा. G2G-..." required maxLength={90} style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
+            <label htmlFor="track-order" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>{t("Order ID")}</label>
+            <input id="track-order" value={orderId} onChange={(e) => setOrderId(e.target.value.toUpperCase())} placeholder={t("उदा. G2G-...")} required maxLength={90} style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
             <label htmlFor="track-phone" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>{t("नोंदणीकृत मोबाईल नंबर")}</label>
             <input id="track-phone" inputMode="numeric" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder={t("10 अंकी नंबर")} required style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
             <button disabled={loading} style={{ marginTop: 16, width: "100%", border: 0, borderRadius: 9, padding: 13, background: "#1f5b3b", color: "#fff", fontWeight: 700 }}>{loading ? t("तपासत आहे...") : t("ऑर्डर तपासा")}</button>
