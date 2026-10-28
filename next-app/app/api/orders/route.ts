@@ -38,22 +38,28 @@ export async function POST(request: Request) {
   };
 
   const uri = process.env.MONGODB_URI;
-  if (uri) {
-    let client: MongoClient | undefined;
-    try {
-      client = new MongoClient(uri);
-      await client.connect();
-      const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
-      await db.collection("orders").insertOne(order);
-    } catch (error) {
-      console.error("Order persistence failed", error);
-      return NextResponse.json({ error: "ऑर्डर सेव्ह झाली नाही. कृपया पुन्हा प्रयत्न करा." }, { status: 503 });
-    } finally {
-      await client?.close();
-    }
-  } else {
-    console.warn("MONGODB_URI is not set; order accepted for demo only and is not persisted.", orderId);
+  if (!uri) {
+    console.error("MONGODB_URI is not set; refusing to accept an order that cannot be persisted.");
+    return NextResponse.json(
+      { error: "डेटाबेस कनेक्शन उपलब्ध नाही. ऑर्डर सेव्ह झाली नाही; कृपया नंतर पुन्हा प्रयत्न करा." },
+      { status: 503 }
+    );
   }
 
-  return NextResponse.json({ ok: true, orderId, persisted: Boolean(uri) }, { status: 201 });
+  let client: MongoClient | undefined;
+  try {
+    client = new MongoClient(uri);
+    await client.connect();
+    const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
+    await db.collection("orders").insertOne(order);
+    return NextResponse.json({ ok: true, orderId, persisted: true }, { status: 201 });
+  } catch (error) {
+    console.error("Order persistence failed", error);
+    return NextResponse.json(
+      { error: "ऑर्डर डेटाबेसमध्ये सेव्ह झाली नाही. कृपया पुन्हा प्रयत्न करा." },
+      { status: 503 }
+    );
+  } finally {
+    await client?.close();
+  }
 }
