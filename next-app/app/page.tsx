@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import LanguageSwitcher, { useAppLanguage } from "./components/LanguageSwitcher";
 
 type Product = {
   id: string;
@@ -24,6 +25,7 @@ const bagSizes = [5, 25, 50, 100];
 type BasketItem = { key: string; product: Product; variety: string; bagSize: number; bags: number };
 
 export default function Home() {
+  const { language, t } = useAppLanguage();
   const [products, setProducts] = useState<Product[]>(defaultProducts);
   useEffect(() => {
     let active = true;
@@ -55,7 +57,7 @@ export default function Home() {
       if (found) return old.map((item) => item.key === key ? { ...item, bags: item.bags + 1 } : item);
       return [...old, { key, product, variety, bagSize, bags: 1 }];
     });
-    setNotice(product.name + " बास्केटमध्ये जोडले!");
+    setNotice((language === "en" ? product.english : language === "hi" ? t(product.name) : product.name) + " " + t("बास्केटमध्ये जोडले!"));
   }
 
   function changeBags(key: string, delta: number) {
@@ -64,7 +66,7 @@ export default function Home() {
 
   async function placeOrder() {
     if (!customer.name.trim() || !/^[6-9]\d{9}$/.test(customer.phone) || !customer.address.trim() || basket.length === 0) {
-      setNotice("कृपया नाव, योग्य 10 अंकी मोबाईल नंबर, पत्ता आणि बास्केट तपासा.");
+      setNotice(t("कृपया नाव, योग्य 10 अंकी मोबाईल नंबर, पत्ता आणि बास्केट तपासा."));
       return;
     }
     setSending(true);
@@ -80,12 +82,12 @@ export default function Home() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "ऑर्डर नोंदवता आली नाही.");
-      setNotice("धन्यवाद! ऑर्डर नोंदवली. ऑर्डर क्रमांक: " + data.orderId + ". फोनवरून पुष्टी केली जाईल.");
+      setNotice(t("धन्यवाद! ऑर्डर नोंदवली. ऑर्डर क्रमांक: ") + data.orderId + t(". फोनवरून पुष्टी केली जाईल."));
       setBasket([]);
       setCheckoutOpen(false);
       setCustomer({ name: "", phone: "", address: "" });
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा.");
+      setNotice(error instanceof Error ? error.message : t("काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा."));
     } finally {
       setSending(false);
     }
@@ -93,41 +95,41 @@ export default function Home() {
 
   return (
     <main id="home" className="app-shell">
-      <div className="topbar"><div className="container topbar-inner"><span>🌿 शेतकऱ्यांकडून तुमच्या घरापर्यंत</span><span>📞 ऑर्डरनंतर फोनवर पुष्टी</span></div></div>
+      <div className="topbar"><div className="container topbar-inner"><span>🌿 {t("शेतकऱ्यांकडून तुमच्या घरापर्यंत")}</span><span>📞 {t("ऑर्डरनंतर फोनवर पुष्टी")}</span></div></div>
       <header className="site-header">
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
-          <a className="basket-link" href="#basket">🧺 बास्केट <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
-          <a className="basket-link" href="/track">📦 ऑर्डर ट्रॅक करा</a>
+          <LanguageSwitcher /><a className="basket-link" href="#basket">🧺 {t("बास्केट")} <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
+          <a className="basket-link" href="/track">📦 {t("ऑर्डर ट्रॅक करा")}</a>
         </div>
       </header>
 
       <section className="hero">
         <div className="container hero-grid">
-          <div className="hero-copy"><span className="eyebrow">मातीचा सुगंध • विश्वासाची चव</span><h1>गावाकडचे धान्य,<br /><em>आता तुमच्या घरी.</em></h1><p>निवडक धान्य, पारंपरिक वाण आणि सोपी घरपोच ऑर्डर. तुमच्या कुटुंबासाठी योग्य धान्य निवडा.</p><a className="primary-button" href="#products">धान्य निवडा <span>↓</span></a><div className="trust-row"><span>✓ सोपी ऑर्डर</span><span>✓ स्पष्ट किंमत</span><span>✓ फोनवर पुष्टी</span></div></div>
-          <div className="hero-art"><div className="sun"></div><div className="hero-emoji">🌾</div><div className="grain-badge"><strong>थेट गावातून</strong><span>घरापर्यंत काळजीपूर्वक</span></div></div>
+          <div className="hero-copy"><span className="eyebrow">{t("मातीचा सुगंध • विश्वासाची चव")}</span><h1>{t("गावाकडचे धान्य,")}<br /><em>{t("आता तुमच्या घरी.")}</em></h1><p>{t("निवडक धान्य, पारंपरिक वाण आणि सोपी घरपोच ऑर्डर. तुमच्या कुटुंबासाठी योग्य धान्य निवडा.")}</p><a className="primary-button" href="#products">{t("धान्य निवडा")} <span>↓</span></a><div className="trust-row"><span>✓ {t("सोपी ऑर्डर")}</span><span>✓ {t("स्पष्ट किंमत")}</span><span>✓ {t("फोनवर पुष्टी")}</span></div></div>
+          <div className="hero-art"><div className="sun"></div><div className="hero-emoji">🌾</div><div className="grain-badge"><strong>{t("थेट गावातून")}</strong><span>{t("घरापर्यंत काळजीपूर्वक")}</span></div></div>
         </div>
       </section>
 
-      <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>निवडक धान्य</strong><small>विविध पारंपरिक वाण</small></p></div><div><span>⚖️</span><p><strong>तुमच्या गरजेनुसार</strong><small>5 ते 100 किलो बॅग</small></p></div><div><span>🏡</span><p><strong>घरपोच सेवा</strong><small>पत्त्यानुसार पुष्टी</small></p></div></div></section>
+      <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>{t("निवडक धान्य")}</strong><small>{t("विविध पारंपरिक वाण")}</small></p></div><div><span>⚖️</span><p><strong>{t("तुमच्या गरजेनुसार")}</strong><small>5–100 {t("किलो")} pack</small></p></div><div><span>🏡</span><p><strong>{t("घरपोच सेवा")}</strong><small>{t("पत्त्यानुसार पुष्टी")}</small></p></div></div></section>
 
-      <section className="section container" id="products"><div className="section-heading"><div><span className="eyebrow">आमची निवड</span><h2>घरासाठी चांगले धान्य</h2><p>वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.</p></div><span className="product-count">{products.length} उत्पादने</span></div>
-        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><span className="product-emoji">{product.emoji}</span><span className="quality-tag">निवडक धान्य</span></div><div className="product-content"><div className="product-title"><div><h3>{product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>किंमत निश्चित करायची</small>}</div></div><p className="product-note">{product.note}</p><label htmlFor={"variety-" + product.id}>वाण निवडा</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety}>{variety}</option>)}</select><label htmlFor={"size-" + product.id}>बॅगचे वजन</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} किलो</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>किंमत लवकरच</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा" : "किंमत बाकी"}</button></div></div></article>)}</div>
+      <section className="section container" id="products"><div className="section-heading"><div><span className="eyebrow">{t("आमची निवड")}</span><h2>{t("घरासाठी चांगले धान्य")}</h2><p>{t("वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.")}</p></div><span className="product-count">{products.length} {t("उत्पादने")}</span></div>
+        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><span className="product-emoji">{product.emoji}</span><span className="quality-tag">{t("निवडक धान्य")}</span></div><div className="product-content"><div className="product-title"><div><h3>{language === "en" ? product.english : language === "hi" ? t(product.name) : product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>{t("किंमत निश्चित करायची")}</small>}</div></div><p className="product-note">{t(product.note)}</p><label htmlFor={"variety-" + product.id}>{t("वाण निवडा")}</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety}>{variety}</option>)}</select><label htmlFor={"size-" + product.id}>{t("बॅगचे वजन")}</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} {t("किलो")}</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>{t("किंमत लवकरच")}</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा"  : t("किंमत बाकी")}</button></div></div></article>)}</div>
       </section>
 
-      <section className="basket-section" id="basket"><div className="container basket-layout"><div><span className="eyebrow">तुमची खरेदी</span><h2>तुमची बास्केट</h2><p className="muted">बॅगची संख्या + / − करून बदलू शकता.</p>{basket.length === 0 ? <div className="empty-basket"><span>🧺</span><strong>तुमची बास्केट रिकामी आहे</strong><p>आवडते धान्य निवडून बास्केटमध्ये जोडा.</p><a href="#products">धान्य पाहा →</a></div> : <div className="basket-items">{basket.map((item) => <div className="basket-item" key={item.key}><div className="mini-grain">{item.product.emoji}</div><div className="basket-item-info"><strong>{item.product.name} — {item.variety}</strong><small>{item.bagSize} किलो बॅग · ₹{item.product.pricePerKg}/किलो</small><b>₹{item.bagSize * item.bags * item.product.pricePerKg}</b></div><div className="stepper"><button aria-label="कमी करा" onClick={() => changeBags(item.key, -1)}>−</button><span>{item.bags}</span><button aria-label="वाढवा" onClick={() => changeBags(item.key, 1)}>＋</button></div></div>)}</div>}</div>
-        <aside className="summary-card"><h3>ऑर्डरचा तपशील</h3><div className="summary-line"><span>एकूण वजन</span><strong>{totalKg} किलो</strong></div><div className="summary-line"><span>धान्याची किंमत</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div className="summary-line"><span>डिलिव्हरी</span><strong>{delivery === 0 ? "₹0" : "₹" + delivery}</strong></div><div className="summary-line total-line"><span>एकूण रक्कम</span><strong>₹{total.toLocaleString("en-IN")}</strong></div><p className="summary-note">₹1,500 किंवा अधिक खरेदीवर अंदाजित मोफत डिलिव्हरी. अंतिम शुल्क फोनवर कळवले जाईल.</p><button className="primary-button full-button" disabled={!basket.length} onClick={() => setCheckoutOpen(!checkoutOpen)}>{checkoutOpen ? "फॉर्म बंद करा" : "ऑर्डर पुढे न्या"} →</button>
-          {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">तुमचे नाव</label><input id="customer-name" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder="पूर्ण नाव" /><label htmlFor="customer-phone">मोबाईल नंबर</label><input id="customer-phone" inputMode="numeric" maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder="10 अंकी नंबर" /><label htmlFor="customer-address">पूर्ण पत्ता</label><textarea id="customer-address" rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder="घर क्रमांक, परिसर, शहर, पिनकोड" /><p className="cod-note">पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.</p><button className="primary-button full-button" disabled={sending} onClick={placeOrder}>{sending ? "ऑर्डर नोंदवत आहे..." : "ऑर्डर निश्चित करा"}</button></div>}
+      <section className="basket-section" id="basket"><div className="container basket-layout"><div><span className="eyebrow">{t("तुमची खरेदी")}</span><h2>{t("तुमची बास्केट")}</h2><p className="muted">{t("बॅगची संख्या + / − करून बदलू शकता.")}</p>{basket.length === 0 ? <div className="empty-basket"><span>🧺</span><strong>{t("तुमची बास्केट रिकामी आहे")}</strong><p>{t("आवडते धान्य निवडून बास्केटमध्ये जोडा.")}</p><a href="#products">{t("धान्य पाहा")} →</a></div> : <div className="basket-items">{basket.map((item) => <div className="basket-item" key={item.key}><div className="mini-grain">{item.product.emoji}</div><div className="basket-item-info"><strong>{language === "en" ? item.product.english : language === "hi" ? t(item.product.name) : item.product.name} — {item.variety}</strong><small>{item.bagSize} किलो बॅग · ₹{item.product.pricePerKg}/किलो</small><b>₹{item.bagSize * item.bags * item.product.pricePerKg}</b></div><div className="stepper"><button aria-label={t("कमी करा")} onClick={() => changeBags(item.key, -1)}>−</button><span>{item.bags}</span><button aria-label={t("वाढवा")} onClick={() => changeBags(item.key, 1)}>＋</button></div></div>)}</div>}</div>
+        <aside className="summary-card"><h3>{t("ऑर्डरचा तपशील")}</h3><div className="summary-line"><span>{t("एकूण वजन")}</span><strong>{totalKg} किलो</strong></div><div className="summary-line"><span>{t("धान्याची किंमत")}</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div className="summary-line"><span>{t("डिलिव्हरी")}</span><strong>{delivery === 0 ? "₹0" : "₹" + delivery}</strong></div><div className="summary-line total-line"><span>{t("एकूण रक्कम")}</span><strong>₹{total.toLocaleString("en-IN")}</strong></div><p className="summary-note">{t("₹1,500 किंवा अधिक खरेदीवर अंदाजित मोफत डिलिव्हरी. अंतिम शुल्क फोनवर कळवले जाईल.")}</p><button className="primary-button full-button" disabled={!basket.length} onClick={() => setCheckoutOpen(!checkoutOpen)}>{checkoutOpen ? t("फॉर्म बंद करा") : t("ऑर्डर पुढे न्या")} →</button>
+          {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">{t("तुमचे नाव")}</label><input id="customer-name" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder={t("पूर्ण नाव")} /><label htmlFor="customer-phone">{t("मोबाईल नंबर")}</label><input id="customer-phone" inputMode="numeric" maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder={t("10 अंकी नंबर")} /><label htmlFor="customer-address">{t("पूर्ण पत्ता")}</label><textarea id="customer-address" rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder={t("घर क्रमांक, परिसर, शहर, पिनकोड")} /><p className="cod-note">{t("पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.")}</p><button className="primary-button full-button" disabled={sending} onClick={placeOrder}>{sending ? t("ऑर्डर नोंदवत आहे...") : t("ऑर्डर निश्चित करा")}</button></div>}
         </aside></div></section>
-      <footer className="footer"><div className="container footer-inner"><a className="brand footer-brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo footer-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a><p>शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.</p><small>© {new Date().getFullYear()} Gaav2Ghar. सर्व हक्क राखीव.</small></div></footer>
+      <footer className="footer"><div className="container footer-inner"><a className="brand footer-brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo footer-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a><p>{t("शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.")}</p><small>© {new Date().getFullYear()} Gaav2Ghar. सर्व हक्क राखीव.</small></div></footer>
       <nav className="mobile-bottom-nav" aria-label="मुख्य नेव्हिगेशन">
-        <a className="mobile-nav-item active" href="#home"><span>⌂</span><small>होम</small></a>
-        <a className="mobile-nav-item" href="#products"><span>🌾</span><small>धान्य</small></a>
-        <a className="mobile-nav-item" href="#basket"><span>🧺</span><small>बास्केट{basket.length ? " (" + basket.reduce((n, item) => n + item.bags, 0) + ")" : ""}</small></a>
+        <a className="mobile-nav-item active" href="#home"><span>⌂</span><small>{t("होम")}</small></a>
+        <a className="mobile-nav-item" href="#products"><span>🌾</span><small>{t("धान्य")}</small></a>
+        <a className="mobile-nav-item" href="#basket"><span>🧺</span><small>{t("बास्केट")}{basket.length ? " (" + basket.reduce((n, item) => n + item.bags, 0) + ")" : ""}</small></a>
       </nav>
       {basket.length > 0 && <div className="mobile-cart-dock">
         <div className="mobile-cart-copy"><strong>₹{total.toLocaleString("en-IN")}</strong><small>{totalKg} किलो · {basket.reduce((n, item) => n + item.bags, 0)} बॅग</small></div>
-        <a className="mobile-cart-button" href="#basket">बास्केट पाहा <span>→</span></a>
+        <a className="mobile-cart-button" href="#basket">{t("बास्केट पाहा")} <span>→</span></a>
       </div>}
       {notice && <div className="toast" role="status"><span>{notice}</span><button onClick={() => setNotice("")} aria-label="बंद करा">×</button></div>}
     </main>

@@ -70,3 +70,18 @@ button,.primary-button,.add-button,.basket-link,.mobile-nav-item,.mobile-cart-bu
 }
 .mobile-bottom-nav,.mobile-cart-dock{display:none}
 @media(max-width:650px){.mobile-bottom-nav{display:flex}.mobile-cart-dock{display:flex}}
+
+
+/* Trilingual controls and Bootstrap 5 admin polish */
+.language-switcher{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px 9px;color:var(--green);font-size:13px;font-weight:700;white-space:nowrap}
+.language-switcher select{width:auto;min-width:94px;min-height:32px;border:0;background:transparent;color:var(--green);font:inherit;padding:2px 22px 2px 2px;outline-offset:3px;cursor:pointer}
+.admin-shell .panel{padding:22px}
+.admin-shell .order{background:#fff;box-shadow:0 4px 18px #183e2408;transition:box-shadow .18s,border-color .18s}
+.admin-shell .order:hover{border-color:#b8cbb5;box-shadow:0 8px 24px #183e2410}
+.admin-shell .order select,.admin-shell input{transition:border-color .15s,box-shadow .15s}
+.admin-shell .order select:focus,.admin-shell input:focus{border-color:var(--green);box-shadow:0 0 0 .2rem #1f5b3b18;outline:0}
+.admin-shell .btn{border-radius:9px;padding:10px 14px;font-weight:700}
+.admin-shell .btn-success{background:var(--green);border-color:var(--green)}
+.admin-shell .btn-outline-success{color:var(--green);border-color:#cbdac8}
+.admin-shell .btn-outline-success:hover{background:var(--green-soft);color:var(--green)}
+@media(max-width:700px){.admin-shell .panel{padding:14px}.admin-shell .order{padding:14px}.language-switcher select{min-width:76px;font-size:12px}}
