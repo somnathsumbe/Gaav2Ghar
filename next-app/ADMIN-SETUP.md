@@ -25,3 +25,10 @@ Redeploy after changing environment variables. Do not commit `.env.local` or rea
 - `GET /api/orders/track?orderId=...&phone=...`: verifies order ID and the order's registered phone before returning limited tracking details.
 
 Supported statuses: `pending_confirmation`, `confirmed`, `packed`, `out_for_delivery`, `delivered`, `cancelled`.
+
+## Product catalogue
+- The public `GET /api/products` endpoint safely seeds missing starter products into the `products` collection using upserts that do not overwrite existing records.
+- The customer page reads its catalogue from MongoDB.
+- Open `/admin/products` to update prices, varieties, descriptions, and availability.
+- Bajri, Moong, and Onions start with `pricePerKg: 0` intentionally. Set their actual selling prices in Admin before accepting orders; zero-priced products cannot be added to the basket.
+- Confirm the existing wheat, rice, jowar, and toor dal prices against your actual business prices before launch.
