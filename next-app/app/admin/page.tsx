@@ -153,7 +153,7 @@ export default function AdminPage() {
           <>
             <header className="admin-top">
               <div><p className="muted">Gaav2Ghar • Order Management</p><h1>ऑर्डर व्यवस्थापन</h1><p className="muted">शेवटच्या 200 ऑर्डर्स • {orders.length} ऑर्डर्स</p></div>
-              <div style={{ display: "flex", gap: 8 }}><button className="secondary" onClick={() => void loadOrders()} disabled={loading}>↻ Refresh</button><button onClick={() => void logout()}>Logout</button></div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><a href="/admin/products" className="secondary" style={{ display: "inline-flex", alignItems: "center", borderRadius: 9, padding: "11px 15px", fontWeight: 700 }}>उत्पादने व किंमत</a><button className="secondary" onClick={() => void loadOrders()} disabled={loading}>↻ Refresh</button><button onClick={() => void logout()}>Logout</button></div>
             </header>
             {message && <p className="message" role="status">{message}</p>}
             <section className="panel">
