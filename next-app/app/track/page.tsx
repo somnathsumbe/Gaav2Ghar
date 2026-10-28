@@ -22,6 +22,7 @@ const statusLabels: Record<string, string> = {
 const steps = ["pending_confirmation", "confirmed", "packed", "out_for_delivery", "delivered"];
 
 export default function TrackPage() {
+  const { t } = useAppLanguage();
   const [orderId, setOrderId] = useState("");
   const [phone, setPhone] = useState("");
   const [order, setOrder] = useState<TrackedOrder | null>(null);
