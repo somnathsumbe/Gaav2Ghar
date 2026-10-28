@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { MongoClient, type Document } from "mongodb";
 import { ADMIN_COOKIE_NAME, isAdminConfigured, isValidAdminSession } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+type StoredOrder = Document & { orderId: string; statusHistory?: Array<{ status: string; changedAt: Date }> };
 
 const STATUSES = [
   "pending_confirmation",
@@ -72,7 +74,7 @@ export async function PATCH(request: Request) {
     client = new MongoClient(databaseUri(), { serverSelectionTimeoutMS: 5000 });
     await client.connect();
     const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
-    const result = await db.collection("orders").updateOne(
+    const result = await db.collection<StoredOrder>("orders").updateOne(
       { orderId: body.orderId },
       {
         $set: { status: body.status, updatedAt: new Date() },
