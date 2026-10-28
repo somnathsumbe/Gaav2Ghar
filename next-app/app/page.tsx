@@ -89,6 +89,7 @@ export default function Home() {
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
           <a className="basket-link" href="#basket">🧺 बास्केट <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
+          <a className="basket-link" href="/track">📦 ऑर्डर ट्रॅक करा</a>
         </div>
       </header>
 
