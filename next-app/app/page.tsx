@@ -83,11 +83,11 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main id="home" className="app-shell">
       <div className="topbar"><div className="container topbar-inner"><span>🌿 शेतकऱ्यांकडून तुमच्या घरापर्यंत</span><span>📞 ऑर्डरनंतर फोनवर पुष्टी</span></div></div>
       <header className="site-header">
         <div className="container header-inner">
-          <a className="brand" href="#" aria-label="Gaav2Ghar home"><span className="brand-mark">🌾</span><span><strong>Gaav2Ghar</strong><small>गावाकडचे धान्य, घरपोच</small></span></a>
+          <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
           <a className="basket-link" href="#basket">🧺 बास्केट <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
         </div>
       </header>
@@ -109,7 +109,16 @@ export default function Home() {
         <aside className="summary-card"><h3>ऑर्डरचा तपशील</h3><div className="summary-line"><span>एकूण वजन</span><strong>{totalKg} किलो</strong></div><div className="summary-line"><span>धान्याची किंमत</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div className="summary-line"><span>डिलिव्हरी</span><strong>{delivery === 0 ? "₹0" : "₹" + delivery}</strong></div><div className="summary-line total-line"><span>एकूण रक्कम</span><strong>₹{total.toLocaleString("en-IN")}</strong></div><p className="summary-note">₹1,500 किंवा अधिक खरेदीवर अंदाजित मोफत डिलिव्हरी. अंतिम शुल्क फोनवर कळवले जाईल.</p><button className="primary-button full-button" disabled={!basket.length} onClick={() => setCheckoutOpen(!checkoutOpen)}>{checkoutOpen ? "फॉर्म बंद करा" : "ऑर्डर पुढे न्या"} →</button>
           {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">तुमचे नाव</label><input id="customer-name" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder="पूर्ण नाव" /><label htmlFor="customer-phone">मोबाईल नंबर</label><input id="customer-phone" inputMode="numeric" maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder="10 अंकी नंबर" /><label htmlFor="customer-address">पूर्ण पत्ता</label><textarea id="customer-address" rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder="घर क्रमांक, परिसर, शहर, पिनकोड" /><p className="cod-note">पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.</p><button className="primary-button full-button" disabled={sending} onClick={placeOrder}>{sending ? "ऑर्डर नोंदवत आहे..." : "ऑर्डर निश्चित करा"}</button></div>}
         </aside></div></section>
-      <footer className="footer"><div className="container footer-inner"><a className="brand footer-brand" href="#"><span className="brand-mark">🌾</span><span><strong>Gaav2Ghar</strong><small>गावाकडचे धान्य, घरपोच</small></span></a><p>शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.</p><small>© {new Date().getFullYear()} Gaav2Ghar. सर्व हक्क राखीव.</small></div></footer>
+      <footer className="footer"><div className="container footer-inner"><a className="brand footer-brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo footer-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a><p>शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.</p><small>© {new Date().getFullYear()} Gaav2Ghar. सर्व हक्क राखीव.</small></div></footer>
+      <nav className="mobile-bottom-nav" aria-label="मुख्य नेव्हिगेशन">
+        <a className="mobile-nav-item active" href="#home"><span>⌂</span><small>होम</small></a>
+        <a className="mobile-nav-item" href="#products"><span>🌾</span><small>धान्य</small></a>
+        <a className="mobile-nav-item" href="#basket"><span>🧺</span><small>बास्केट{basket.length ? " (" + basket.reduce((n, item) => n + item.bags, 0) + ")" : ""}</small></a>
+      </nav>
+      {basket.length > 0 && <div className="mobile-cart-dock">
+        <div className="mobile-cart-copy"><strong>₹{total.toLocaleString("en-IN")}</strong><small>{totalKg} किलो · {basket.reduce((n, item) => n + item.bags, 0)} बॅग</small></div>
+        <a className="mobile-cart-button" href="#basket">बास्केट पाहा <span>→</span></a>
+      </div>}
       {notice && <div className="toast" role="status"><span>{notice}</span><button onClick={() => setNotice("")} aria-label="बंद करा">×</button></div>}
     </main>
   );
