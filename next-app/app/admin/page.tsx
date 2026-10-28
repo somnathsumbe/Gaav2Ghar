@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import LanguageSwitcher, { useAppLanguage } from "../components/LanguageSwitcher";
 
 type OrderItem = {
   product?: string;
@@ -109,7 +110,7 @@ export default function AdminPage() {
   const filtered = orders.filter((order) => filter === "all" || (order.status || "pending_confirmation") === filter);
 
   return (
-    <main className="admin-shell">
+    <main className="admin-shell container-fluid">
       <style jsx>{`
         .admin-shell{min-height:100vh;background:#f5f7f2;padding:28px 16px 60px;color:#203126}
         .admin-wrap{max-width:1180px;margin:0 auto}
@@ -138,43 +139,43 @@ export default function AdminPage() {
       <div className="admin-wrap">
         {!authenticated ? (
           <section className="panel login-panel">
-            <p className="muted">Gaav2Ghar • सुरक्षित Admin</p>
+            <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap"><p className="muted mb-0">Gaav2Ghar • {t("सुरक्षित Admin")}</p><LanguageSwitcher /></div>
             <h1>Admin Login</h1>
-            <p className="muted">ऑर्डर्स पाहण्यासाठी Admin password टाका.</p>
+            <p className="muted">{t("ऑर्डर्स पाहण्यासाठी Admin password टाका.")}</p>
             {message && <p className="message" role="status">{message}</p>}
             <form onSubmit={login}>
-              <label htmlFor="admin-password">Admin Password</label>
+              <label htmlFor="admin-password">{t("Admin Password")}</label>
               <input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required maxLength={200} />
-              <button style={{ width: "100%", marginTop: 16 }} disabled={loading}>{loading ? "कृपया थांबा..." : "Login करा"}</button>
+              <button style={{ width: "100%", marginTop: 16 }} disabled={loading}>{loading ? t("कृपया थांबा...") : t("Login करा")}</button>
             </form>
-            <p className="muted" style={{ fontSize: 12, marginTop: 18 }}>पासवर्ड विसरल्यास Vercel Environment Variables मध्ये ADMIN_PASSWORD तपासा.</p>
+            <p className="muted" style={{ fontSize: 12, marginTop: 18 }}>{t("पासवर्ड विसरल्यास Vercel Environment Variables मध्ये ADMIN_PASSWORD तपासा.")}</p>
           </section>
         ) : (
           <>
             <header className="admin-top">
-              <div><p className="muted">Gaav2Ghar • Order Management</p><h1>ऑर्डर व्यवस्थापन</h1><p className="muted">शेवटच्या 200 ऑर्डर्स • {orders.length} ऑर्डर्स</p></div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><a href="/admin/products" className="secondary" style={{ display: "inline-flex", alignItems: "center", borderRadius: 9, padding: "11px 15px", fontWeight: 700 }}>उत्पादने व किंमत</a><button className="secondary" onClick={() => void loadOrders()} disabled={loading}>↻ Refresh</button><button onClick={() => void logout()}>Logout</button></div>
+              <div><p className="muted">Gaav2Ghar • {t("Order Management")}</p><h1>{t("ऑर्डर व्यवस्थापन")}</h1><p className="muted">{t("शेवटच्या 200 ऑर्डर्स")} • {orders.length} {t("ऑर्डर्स")}</p></div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><LanguageSwitcher /><a href="/admin/products" className="secondary" style={{ display: "inline-flex", alignItems: "center", borderRadius: 9, padding: "11px 15px", fontWeight: 700 }}>{t("उत्पादने व किंमत")}</a><button className="btn btn-outline-success" onClick={() => void loadOrders()} disabled={loading}>↻ Refresh</button><button className="btn btn-danger" onClick={() => void logout()}>Logout</button></div>
             </header>
             {message && <p className="message" role="status">{message}</p>}
-            <section className="panel">
-              <div className="toolbar"><h2 style={{ margin: 0 }}>Customer Orders</h2><select aria-label="Status filter" value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">सर्व ऑर्डर्स</option>{statuses.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
-              {loading && orders.length === 0 ? <p className="empty">ऑर्डर्स लोड होत आहेत...</p> : filtered.length === 0 ? <p className="empty">या filter मध्ये ऑर्डर्स नाहीत.</p> : (
+            <section className="panel card shadow-sm border-0">
+              <div className="toolbar"><h2 style={{ margin: 0 }}>{t("Customer Orders")}</h2><select aria-label="Status filter" value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">{t("सर्व ऑर्डर्स")}</option>{statuses.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select></div>
+              {loading && orders.length === 0 ? <p className="empty">{t("ऑर्डर्स लोड होत आहेत...")}</p> : filtered.length === 0 ? <p className="empty">{t("या filter मध्ये ऑर्डर्स नाहीत.")}</p> : (
                 <div className="order-list">
                   {filtered.map((order) => (
                     <article className="order" key={order.orderId}>
                       <div>
                         <h2>{order.orderId}</h2>
-                        <p className="detail"><strong>ग्राहक:</strong> {order.customer?.name || "—"}</p>
+                        <p className="detail"><strong>{t("ग्राहक:")}</strong> {order.customer?.name || "—"}</p>
                         <p className="detail"><strong>मोबाईल:</strong> {order.customer?.phone || "—"}</p>
-                        <p className="detail"><strong>पत्ता:</strong> {order.customer?.address || "—"}</p>
-                        <p className="detail"><strong>ऑर्डर वेळ:</strong> {date(order.createdAt)}</p>
+                        <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>
+                        <p className="detail"><strong>{t("ऑर्डर वेळ:")}</strong> {date(order.createdAt)}</p>
                         <ul className="items">{(order.items || []).map((item, index) => <li key={index}>{item.product || "धान्य"} — {item.variety || "—"}; {item.bagSizeKg || 0} किलो × {item.bags || 0} बॅग = {item.quantityKg || (Number(item.bagSizeKg) * Number(item.bags)) || 0} किलो</li>)}</ul>
                         <p className="detail">Payment: {order.paymentMethod || "COD"} • Delivery: {money(order.deliveryCharge)}</p>
                         <p className="total">एकूण: {money(order.total)}</p>
                       </div>
                       <div>
-                        <label htmlFor={"status-" + order.orderId}>Order Status</label>
-                        <select id={"status-" + order.orderId} value={order.status || "pending_confirmation"} onChange={(event) => void updateStatus(order.orderId, event.target.value)}>{statuses.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
+                        <label htmlFor={"status-" + order.orderId}>Order Status / {t("सध्याची स्थिती:")}</label>
+                        <select id={"status-" + order.orderId} value={order.status || "pending_confirmation"} onChange={(event) => void updateStatus(order.orderId, event.target.value)}>{statuses.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
                         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Status बदलल्यावर database मध्ये save होईल.</p>
                       </div>
                     </article>
