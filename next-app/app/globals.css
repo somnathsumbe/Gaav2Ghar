@@ -85,3 +85,81 @@ button,.primary-button,.add-button,.basket-link,.mobile-nav-item,.mobile-cart-bu
 .admin-shell .btn-outline-success{color:var(--green);border-color:#cbdac8}
 .admin-shell .btn-outline-success:hover{background:var(--green-soft);color:var(--green)}
 @media(max-width:700px){.admin-shell .panel{padding:14px}.admin-shell .order{padding:14px}.language-switcher select{min-width:76px;font-size:12px}}
+
+
+/* Gaav2Ghar brand refresh — farmer-to-home visual system */
+:root {
+  --green: #174d32;
+  --green-dark: #103b26;
+  --green-soft: #e9f1e7;
+  --cream: #fbf8ef;
+  --ink: #202a21;
+  --muted: #687366;
+  --line: #e5e4d8;
+  --gold: #d9a62e;
+  --earth: #8d3e20;
+}
+body { background: var(--cream); color: var(--ink); }
+.topbar { background: var(--green-dark); }
+.site-header { background: rgba(255,255,255,.96); border-bottom-color: #e8e8dc; }
+.header-inner { min-height: 82px; }
+.brand-logo { max-width: 236px; height: 66px; object-fit: contain; }
+.primary-button, .add-button, .mobile-cart-button {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 5px 14px rgba(23,77,50,.12);
+}
+.primary-button:hover, .add-button:hover:not(:disabled), .mobile-cart-button:hover {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  transform: translateY(-1px);
+}
+.hero { background: linear-gradient(120deg, #fbf8ef 0%, #f3f3e6 58%, #e8f0e2 100%); }
+.hero-copy h1 { color: var(--green-dark); }
+.hero-copy h1 em { color: var(--earth); }
+.eyebrow, .quality-tag { background: #e7efe2; color: var(--green); }
+.hero-art { border: 1px solid rgba(217,166,46,.28); }
+.grain-badge { border-color: rgba(217,166,46,.45); }
+.section-heading h2, .product-title h3 { color: var(--green-dark); }
+.product-card {
+  border: 1px solid #e8e5d8;
+  border-radius: 18px;
+  box-shadow: 0 7px 22px rgba(39,54,34,.045);
+  overflow: hidden;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.product-card:hover {
+  transform: translateY(-3px);
+  border-color: #d6dfcf;
+  box-shadow: 0 14px 30px rgba(39,54,34,.09);
+}
+.product-visual { background-color: #f0f1e3; }
+.product-content select, .checkout-form input, .checkout-form textarea {
+  border-color: #d9dfd3;
+  border-radius: 10px;
+}
+.product-content select:focus, .checkout-form input:focus, .checkout-form textarea:focus {
+  outline: 2px solid rgba(217,166,46,.45);
+  border-color: var(--green);
+}
+.price strong, .card-footer > span { color: var(--green); }
+.add-button { border-radius: 10px; }
+.basket-section, .how-section { background: #fffdf7; }
+.footer { background: var(--green-dark); color: #f6f4e9; }
+.footer small, .footer p { color: #d6e1d2; }
+.mobile-nav { border-top-color: #e5e4d8; background: rgba(255,253,247,.97); }
+.mobile-nav-item.active { color: var(--green); }
+.mobile-cart-dock { border-color: #dce4d7; box-shadow: 0 -8px 26px rgba(23,77,50,.08); }
+.toast { background: var(--green-dark); }
+button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 3px solid #d9a62e;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .brand-logo { max-width: 190px; height: 58px; }
+  .hero { background: linear-gradient(180deg, #fbf8ef 0%, #f0f2e5 100%); }
+  .product-card { border-radius: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
