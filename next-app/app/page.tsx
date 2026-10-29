@@ -163,7 +163,7 @@ export default function Home() {
           <section className="footer-column footer-contact" id="contact-help">
             <h3>{t("आमच्याशी संपर्क करा")}</h3>
             <p className="footer-contact-item"><span aria-hidden="true">📞</span><span><strong>{t("हेल्पलाइन")}</strong><small>{process.env.NEXT_PUBLIC_SUPPORT_PHONE || t("नंबर लवकरच अपडेट होईल")}</small></span></p>
-            {process.env.NEXT_PUBLIC_SUPPORT_PHONE ? <a className="footer-contact-action" href={`tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE.replace(/[^+\\d]/g, "")}`}>{t("आता कॉल करा")} ↗</a> : null}
+            {process.env.NEXT_PUBLIC_SUPPORT_PHONE ? <a className="footer-contact-action" href={`tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE.replace(/[^+\d]/g, "")}`}>{t("आता कॉल करा")} ↗</a> : null}
             <p className="footer-contact-item"><span aria-hidden="true">✉️</span><span><strong>{t("ईमेल सपोर्ट")}</strong><small>{process.env.NEXT_PUBLIC_SUPPORT_EMAIL || t("ईमेल लवकरच अपडेट होईल")}</small></span></p>
             {process.env.NEXT_PUBLIC_SUPPORT_EMAIL ? <a className="footer-contact-action" href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}>{t("ईमेल पाठवा")} ↗</a> : null}
             <a className="footer-help-link" href="/track">📦 {t("ऑर्डर ट्रॅकिंग / ऑर्डरची मदत")}</a>
