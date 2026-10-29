@@ -85,3 +85,13 @@ button,.primary-button,.add-button,.basket-link,.mobile-nav-item,.mobile-cart-bu
 .admin-shell .btn-outline-success{color:var(--green);border-color:#cbdac8}
 .admin-shell .btn-outline-success:hover{background:var(--green-soft);color:var(--green)}
 @media(max-width:700px){.admin-shell .panel{padding:14px}.admin-shell .order{padding:14px}.language-switcher select{min-width:76px;font-size:12px}}
+
+
+/* Compact icon-only basket and tracking controls; native title supplies hover tooltip. */
+.header-actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+.header-icon-only{position:relative;display:inline-flex;align-items:center;justify-content:center;width:50px;min-width:50px;height:48px;padding:8px;border:1px solid var(--line,#e5e4d8);border-radius:12px;background:#fff;color:var(--green-dark,#103b26);text-decoration:none}
+.header-icon-only:hover,.header-icon-only:focus-visible{background:var(--green-soft,#e9f1e7);border-color:#c9d9c7}
+.nav-svg{width:25px;height:25px;display:block}
+.header-icon-only .cart-count{position:absolute;top:-6px;right:-6px;display:grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border:2px solid #fff;border-radius:99px;background:var(--green,#174d32);color:#fff;font-size:10px}
+.language-switcher select{min-width:42px;width:42px;max-width:42px;text-align:center;font-size:12px}
+@media(max-width:760px){.header-actions{gap:8px}.header-icon-only{width:44px;min-width:44px;height:44px;padding:6px}.nav-svg{width:23px;height:23px}}
