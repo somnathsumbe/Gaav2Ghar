@@ -101,8 +101,14 @@ export default function Home() {
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
           <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
             <LanguageSwitcher />
-            <a className="header-action header-cart" href="#basket"><span className="action-icon" aria-hidden="true">🧺</span><span className="action-copy"><strong>{t("माझी बास्केट")}</strong><small>{basket.reduce((n, item) => n + item.bags, 0)} {t("बॅग")}</small></span><b className="cart-count">{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
-            <a className="header-action header-track" href="/track"><span className="action-icon" aria-hidden="true">📦</span><span className="action-copy"><strong>{t("ऑर्डर ट्रॅकिंग")}</strong><small>{t("ऑर्डरची स्थिती पहा")}</small></span><span className="action-chevron" aria-hidden="true">›</span></a>
+            <a className="header-action header-cart header-icon-only" href="#basket" aria-label={t("बास्केट उघडा")} title={t("बास्केट उघडा")}>
+              <svg className="nav-svg basket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M8 13l1 4m7-4-1 4M12 13v4"/></svg>
+              <b className="cart-count">{basket.reduce((n, item) => n + item.bags, 0)}</b>
+            </a>
+            <a className="header-action header-track header-track-compact" href="/track" aria-label={t("ऑर्डर ट्रॅक करा")} title={t("ऑर्डर ट्रॅक करा")}>
+              <svg className="nav-svg track-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="m3.5 7.7 8.5 4.4 8.5-4.4M12 12v9"/><path d="m8.5 6.2 8.8 4.5"/></svg>
+              <span className="track-label">{t("ट्रॅक")}</span>
+            </a>
           </nav>
         </div>
       </header>
