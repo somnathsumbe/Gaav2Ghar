@@ -39,6 +39,10 @@ export default function Home() {
   const { language, t } = useAppLanguage();
   const [products, setProducts] = useState<Product[]>(defaultProducts);
   useEffect(() => {
+    const timer = window.setInterval(() => setActiveBanner((current) => (current + 1) % 5), 5500);
+    return () => window.clearInterval(timer);
+  }, []);
+  useEffect(() => {
     let active = true;
     fetch("/api/products", { cache: "no-store" }).then(async (response) => {
       const data = await response.json();
@@ -53,6 +57,14 @@ export default function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
   const [sending, setSending] = useState(false);
+  const [activeBanner, setActiveBanner] = useState(0);
+  const bannerSlides = [
+    { kicker: "शेतकऱ्यांचा विश्वास", title: "गावाकडचे गहू, घरच्या पोळ्यांसाठी", description: "निवडक गहू आणि पारंपरिक वाण तुमच्या घरापर्यंत.", image: "/wheat.png", emoji: "🌾", alt: "गव्हाचे दाणे" },
+    { kicker: "पारंपरिक पौष्टिकता", title: "ज्वारी — रोजच्या जेवणाची चांगली निवड", description: "तुमच्या गरजेनुसार पॅक निवडा आणि सहज ऑर्डर करा.", image: "/jowar.png", emoji: "🌱", alt: "ज्वारीचे दाणे" },
+    { kicker: "गावचा अस्सल स्वाद", title: "बाजरी आणि पारंपरिक धान्य", description: "गावाकडच्या चवीची आठवण प्रत्येक जेवणात.", image: "/bajra.png", emoji: "🌿", alt: "बाजरीचे दाणे" },
+    { kicker: "रोजच्या स्वयंपाकासाठी", title: "कांदेही मिळवा सोप्या पद्धतीने", description: "घरच्या गरजेची निवड करा आणि ऑर्डरची माहिती सहज मिळवा.", image: "/onion.png", emoji: "🧅", alt: "ताजे कांदे" },
+    { kicker: "सोपी घरपोच खरेदी", title: "तुमचे धान्य, तुमच्या पसंतीचा पॅक", description: "5, 25, 50 किंवा 100 किलोचे पॅक निवडा.", image: "/wheat.png", emoji: "🧺", alt: "घरासाठी धान्याचे पॅक" },
+  ];
 
   const totalKg = useMemo(() => basket.reduce((sum, item) => sum + item.bagSize * item.bags, 0), [basket]);
   const subtotal = useMemo(() => basket.reduce((sum, item) => sum + item.bagSize * item.bags * item.product.pricePerKg, 0), [basket]);
@@ -130,6 +142,14 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="banner-carousel container" aria-label={t("Gaav2Ghar विशेष बॅनर")}>
+        <div className="banner-slide" key={activeBanner}>
+          <div className="banner-copy"><span className="banner-kicker">{t(bannerSlides[activeBanner].kicker)}</span><h2>{t(bannerSlides[activeBanner].title)}</h2><p>{t(bannerSlides[activeBanner].description)}</p><a className="banner-cta" href="#products">{t("धान्य निवडा")} <span aria-hidden="true">→</span></a></div>
+          <div className={"banner-visual banner-visual-" + (activeBanner + 1)}><img src={bannerSlides[activeBanner].image} alt={t(bannerSlides[activeBanner].alt)} onError={(event) => { event.currentTarget.style.display = "none"; }} /><span aria-hidden="true">{bannerSlides[activeBanner].emoji}</span><div className="banner-stamp">🌿 {t("गावाकडून घरापर्यंत")}</div></div>
+        </div>
+        <div className="banner-controls"><button type="button" className="banner-arrow" aria-label={t("मागील बॅनर")} onClick={() => setActiveBanner((activeBanner + bannerSlides.length - 1) % bannerSlides.length)}>←</button><div className="banner-dots" role="group" aria-label={t("बॅनर निवडा")}>{bannerSlides.map((slide, index) => <button type="button" key={slide.title} className={index === activeBanner ? "banner-dot active" : "banner-dot"} aria-label={t("बॅनर क्रमांक") + " " + (index + 1)} aria-current={index === activeBanner ? "true" : undefined} onClick={() => setActiveBanner(index)} />)}</div><span className="banner-count">{String(activeBanner + 1).padStart(2, "0")} / 05</span><button type="button" className="banner-arrow" aria-label={t("पुढील बॅनर")} onClick={() => setActiveBanner((activeBanner + 1) % bannerSlides.length)}>→</button></div>
+      </section>
+
       <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>{t("निवडक धान्य")}</strong><small>{t("विविध पारंपरिक वाण")}</small></p></div><div><span>⚖️</span><p><strong>{t("तुमच्या गरजेनुसार")}</strong><small>5–100 {t("किलो")} pack</small></p></div><div><span>🏡</span><p><strong>{t("घरपोच सेवा")}</strong><small>{t("पत्त्यानुसार पुष्टी")}</small></p></div></div></section>
 
       <section className="section container" id="products"><div className="section-heading"><div><span className="eyebrow">{t("आमची निवड")}</span><h2>{t("घरासाठी चांगले धान्य")}</h2><p>{t("वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.")}</p></div><span className="product-count">{products.length} {t("उत्पादने")}</span></div>
@@ -148,28 +168,19 @@ export default function Home() {
             <span className="footer-trust">🌱 {t("गावाकडून घरापर्यंत विश्वासाने")}</span>
           </section>
           <section className="footer-column">
-            <h3>{t("ग्राहकांसाठी")}</h3>
-            <a href="#products">{t("धान्य आणि किंमती")}</a>
-            <a href="#basket">{t("ऑर्डर कशी करावी")}</a>
-            <a href="/track">{t("ऑर्डर ट्रॅक करा")}</a>
-            <a href="#contact-help">{t("मदत आणि संपर्क")}</a>
+            <h3>{t("ग्राहकांसाठी")}</h3><a href="#products">{t("धान्य आणि किंमती")}</a><a href="#basket">{t("ऑर्डर कशी करावी")}</a><a href="/track">{t("ऑर्डर ट्रॅक करा")}</a><a href="#contact-help">{t("मदत आणि संपर्क")}</a>
           </section>
           <section className="footer-column">
-            <h3>{t("ऑर्डर मदत")}</h3>
-            <p>{t("ऑर्डर दिल्यानंतर आमची टीम फोनवर पुष्टी करेल.")}</p>
-            <p>{t("डिलिव्हरी शुल्क आणि उपलब्धता पत्त्यानुसार कळवली जाईल.")}</p>
-            <a href="#basket">{t("ऑर्डरविषयी प्रश्न? बास्केटकडे जा")} →</a>
+            <h3>{t("ऑर्डर मदत")}</h3><p>{t("ऑर्डर दिल्यानंतर आमची टीम फोनवर पुष्टी करेल.")}</p><p>{t("डिलिव्हरी शुल्क आणि उपलब्धता पत्त्यानुसार कळवली जाईल.")}</p><a href="#basket">{t("ऑर्डरविषयी प्रश्न? बास्केटकडे जा")} →</a>
           </section>
           <section className="footer-column footer-contact" id="contact-help">
             <h3>{t("आमच्याशी संपर्क करा")}</h3>
-            <p className="footer-contact-item"><span aria-hidden="true">📞</span><span><strong>{t("हेल्पलाइन")}</strong><small>{process.env.NEXT_PUBLIC_SUPPORT_PHONE || t("नंबर लवकरच अपडेट होईल")}</small></span></p>
-            {process.env.NEXT_PUBLIC_SUPPORT_PHONE ? <a className="footer-contact-action" href={`tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE.replace(/[^+\d]/g, "")}`}>{t("आता कॉल करा")} ↗</a> : null}
-            <p className="footer-contact-item"><span aria-hidden="true">✉️</span><span><strong>{t("ईमेल सपोर्ट")}</strong><small>{process.env.NEXT_PUBLIC_SUPPORT_EMAIL || t("ईमेल लवकरच अपडेट होईल")}</small></span></p>
-            {process.env.NEXT_PUBLIC_SUPPORT_EMAIL ? <a className="footer-contact-action" href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}>{t("ईमेल पाठवा")} ↗</a> : null}
+            <p className="footer-contact-item"><span aria-hidden="true">📞</span><span><strong>{t("हेल्पलाइन")}</strong><small>9028787219</small></span></p><a className="footer-contact-action" href="tel:+919028787219">{t("आता कॉल करा")} ↗</a>
+            <p className="footer-contact-item"><span aria-hidden="true">✉️</span><span><strong>{t("ईमेल सपोर्ट")}</strong><small>somasumbe@gmail.com</small></span></p><a className="footer-contact-action" href="mailto:somasumbe@gmail.com">{t("ईमेल पाठवा")} ↗</a>
             <a className="footer-help-link" href="/track">📦 {t("ऑर्डर ट्रॅकिंग / ऑर्डरची मदत")}</a>
           </section>
         </div>
-        <div className="container footer-bottom"><small>© {new Date().getFullYear()} Gaav2Ghar. {t("सर्व हक्क राखीव.")}</small><div><a href="#home">{t("होम")}</a><a href="#products">{t("धान्य")}</a><a href="/track">{t("ऑर्डर ट्रॅकिंग")}</a></div></div>
+        <div className="container footer-bottom"><small>© {new Date().getFullYear()} Gaav2Ghar. {t("सर्व हक्क राखीव.")}</small><div><a href="#home">{t("होम")}</a><a href="#products">{t("धान्य")}</a><a href="/track">{t("ऑर्डर ट्रॅक करा")}</a><a href="mailto:somasumbe@gmail.com">{t("संपर्क")}</a></div></div>
       </footer>
       <nav className="mobile-bottom-nav" aria-label="मुख्य नेव्हिगेशन">
         <a className="mobile-nav-item active" href="#home"><span>⌂</span><small>{t("होम")}</small></a>
