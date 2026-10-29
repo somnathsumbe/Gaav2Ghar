@@ -12,11 +12,8 @@ type ProductSeed = {
 
 const seedProducts: ProductSeed[] = [
   { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "शरबती", "बन्सी"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾", active: true },
-  { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["इंद्रायणी", "कोलम", "आंबेमोहोर"], pricePerKg: 58, note: "घरच्या जेवणाची चव", emoji: "🍚", active: true },
   { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱", active: true },
-  { id: "toor-dal", name: "तूर डाळ", english: "Toor Dal", varieties: ["निवडक तूर डाळ"], pricePerKg: 125, note: "निवडक दर्जा", emoji: "🫘", active: true },
   { id: "bajri", name: "बाजरी", english: "Bajri", varieties: ["पांढरी बाजरी", "करडी बाजरी"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
-  { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवा मूग"], pricePerKg: 0, note: "निवडक कडधान्य", emoji: "🫘", active: true },
   { id: "onion", name: "कांदे", english: "Onions", varieties: ["लाल कांदे"], pricePerKg: 0, note: "गावाकडचे कांदे", emoji: "🧅", active: true },
 ];
 
@@ -41,6 +38,8 @@ export async function GET() {
     const connection = await openDb();
     client = connection.client;
     const collection = connection.db.collection("products");
+    // Keep only the products currently offered in the storefront. Mark legacy records inactive so they disappear from customer and admin product lists without deleting order history.
+    await collection.updateMany({ id: { $in: ["rice", "moong", "toor-dal"] } }, { $set: { active: false, updatedAt: new Date() } });
     await collection.bulkWrite(seedProducts.map((product) => ({
       updateOne: { filter: { id: product.id }, update: { $setOnInsert: { ...product, createdAt: new Date(), updatedAt: new Date() } }, upsert: true },
     })));

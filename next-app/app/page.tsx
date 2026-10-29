@@ -15,9 +15,7 @@ type Product = {
 
 const defaultProducts: Product[] = [
   { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "शरबती", "बन्सी"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
-  { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["इंद्रायणी", "कोलम", "आंबेमोहोर"], pricePerKg: 58, note: "घरच्या जेवणाची चव", emoji: "🍚" },
   { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
-  { id: "toor-dal", name: "तूर डाळ", english: "Toor Dal", varieties: ["निवडक तूर डाळ"], pricePerKg: 125, note: "निवडक दर्जा", emoji: "🫘" },
 ];
 
 const bagSizes = [5, 25, 50, 100];
@@ -48,8 +46,8 @@ export default function Home() {
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  const [selected, setSelected] = useState<Record<string, string>>({ wheat: "लोकवन", rice: "इंद्रायणी", jowar: "पांढरी ज्वारी", "toor-dal": "निवडक तूर डाळ" });
-  const [sizes, setSizes] = useState<Record<string, number>>({ wheat: 5, rice: 5, jowar: 5, "toor-dal": 5 });
+  const [selected, setSelected] = useState<Record<string, string>>({ wheat: "लोकवन", jowar: "पांढरी ज्वारी" });
+  const [sizes, setSizes] = useState<Record<string, number>>({ wheat: 5, jowar: 5 });
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [notice, setNotice] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
