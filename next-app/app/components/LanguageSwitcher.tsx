@@ -177,9 +177,9 @@ export default function LanguageSwitcher() {
   return <label className="language-switcher" aria-label="Choose language">
     <span aria-hidden="true">🌐</span>
     <select value={language} onChange={(event) => setLanguage(event.target.value as AppLanguage)} aria-label="Choose language">
-      <option value="mr">{t("मराठी")}</option>
-      <option value="hi">{t("हिंदी")}</option>
-      <option value="en">{t("English")}</option>
+      <option value="mr" title="मराठी">MR</option>
+      <option value="hi" title="हिंदी">HI</option>
+      <option value="en" title="English">EN</option>
     </select>
   </label>;
 }
