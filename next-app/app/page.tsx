@@ -109,7 +109,7 @@ export default function Home() {
       <div className="topbar"><div className="container topbar-inner"><span>🌿 {t("शेतकऱ्यांकडून तुमच्या घरापर्यंत")}</span><span>📞 {t("ऑर्डरनंतर फोनवर पुष्टी")}</span></div></div>
       <header className="site-header">
         <div className="container header-inner">
-          <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
+          <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/logo.png" alt="Gaav2Ghar logo" /></a>
           <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
             <LanguageSwitcher />
             <a className="basket-link header-icon-only" href="#basket" aria-label={t("बास्केट उघडा")} title={t("बास्केट उघडा")}>
