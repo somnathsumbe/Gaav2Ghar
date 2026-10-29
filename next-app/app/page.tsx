@@ -105,9 +105,8 @@ export default function Home() {
               <svg className="nav-svg basket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M8 13l1 4m7-4-1 4M12 13v4"/></svg>
               <b className="cart-count">{basket.reduce((n, item) => n + item.bags, 0)}</b>
             </a>
-            <a className="header-action header-track header-track-compact" href="/track" aria-label={t("ऑर्डर ट्रॅक करा")} title={t("ऑर्डर ट्रॅक करा")}>
+            <a className="header-action header-track header-track-compact header-icon-only" href="/track" aria-label={t("तुमची ऑर्डर ट्रॅक करा")} title={t("तुमची ऑर्डर ट्रॅक करा")}>
               <svg className="nav-svg track-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="m3.5 7.7 8.5 4.4 8.5-4.4M12 12v9"/><path d="m8.5 6.2 8.8 4.5"/></svg>
-              <span className="track-label">{t("ट्रॅक")}</span>
             </a>
           </nav>
         </div>
