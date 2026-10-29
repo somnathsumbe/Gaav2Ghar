@@ -220,3 +220,9 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .header-track-compact.header-icon-only .track-label{display:none}
 .header-track-compact.header-icon-only:hover,.header-track-compact.header-icon-only:focus-visible{background:var(--green-soft);border-color:#c9d9c7}
 @media(max-width:760px){.header-track-compact.header-icon-only{width:48px;min-width:48px;min-height:46px;padding:6px}}
+
+/* Product photography: consistent crop with emoji fallback when an asset is missing. */
+.product-visual{isolation:isolate;overflow:hidden}
+.product-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.product-emoji{position:relative;z-index:1}
+.quality-tag{z-index:2}
