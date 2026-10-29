@@ -110,8 +110,16 @@ export default function Home() {
       <header className="site-header">
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
-          <LanguageSwitcher /><a className="basket-link" href="#basket">🧺 {t("बास्केट")} <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
-          <a className="basket-link" href="/track">📦 {t("ऑर्डर ट्रॅक करा")}</a>
+          <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
+            <LanguageSwitcher />
+            <a className="basket-link header-icon-only" href="#basket" aria-label={t("बास्केट उघडा")} title={t("बास्केट उघडा")}>
+              <svg className="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M8 13l1 4m7-4-1 4M12 13v4"/></svg>
+              <b className="cart-count">{basket.reduce((n, item) => n + item.bags, 0)}</b>
+            </a>
+            <a className="basket-link header-icon-only" href="/track" aria-label={t("तुमची ऑर्डर ट्रॅक करा")} title={t("तुमची ऑर्डर ट्रॅक करा")}>
+              <svg className="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="m3.5 7.7 8.5 4.4 8.5-4.4M12 12v9"/></svg>
+            </a>
+          </nav>
         </div>
       </header>
 
