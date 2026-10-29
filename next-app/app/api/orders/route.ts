@@ -4,7 +4,13 @@ import { MongoClient } from "mongodb";
 export const runtime = "nodejs";
 
 type OrderPayload = {
-  customer?: { name?: string; phone?: string; address?: string };
+  customer?: {
+    name?: string;
+    phone?: string;
+    address?: string;
+    location?: { latitude?: number; longitude?: number; accuracy?: number } | null;
+    whatsappOptIn?: boolean;
+  };
   items?: Array<{ productId: string; product: string; variety: string; bagSizeKg: number; bags: number; quantityKg: number; pricePerKg: number }>;
   subtotal?: number;
   deliveryCharge?: number;
@@ -15,6 +21,12 @@ type OrderPayload = {
 function validOrder(body: OrderPayload) {
   const customer = body.customer;
   if (!customer?.name?.trim() || !customer.phone || !/^[6-9]\d{9}$/.test(customer.phone) || !customer.address?.trim()) return false;
+  if (customer.whatsappOptIn !== undefined && typeof customer.whatsappOptIn !== "boolean") return false;
+  if (customer.location !== undefined && customer.location !== null) {
+    const { latitude, longitude, accuracy } = customer.location;
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude! < -90 || latitude! > 90 || longitude! < -180 || longitude! > 180) return false;
+    if (accuracy !== undefined && (!Number.isFinite(accuracy) || accuracy < 0)) return false;
+  }
   if (!Array.isArray(body.items) || body.items.length === 0 || body.items.length > 30) return false;
   if (!body.items.every((item) => item.productId && item.product && item.variety && [5, 25, 50, 100].includes(item.bagSizeKg) && Number.isInteger(item.bags) && item.bags > 0 && item.bags <= 100 && Number.isFinite(item.pricePerKg) && item.pricePerKg > 0)) return false;
   return Number.isFinite(body.subtotal) && Number.isFinite(body.deliveryCharge) && Number.isFinite(body.total) && body.subtotal! >= 0 && body.deliveryCharge! >= 0 && body.total! >= 0;

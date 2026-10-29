@@ -11,6 +11,7 @@ type Product = {
   pricePerKg: number;
   note: string;
   emoji: string;
+  image?: string;
 };
 
 const defaultProducts: Product[] = [
@@ -18,7 +19,21 @@ const defaultProducts: Product[] = [
   { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["इंद्रायणी", "कोलम", "आंबेमोहोर"], pricePerKg: 58, note: "घरच्या जेवणाची चव", emoji: "🍚" },
   { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
   { id: "toor-dal", name: "तूर डाळ", english: "Toor Dal", varieties: ["निवडक तूर डाळ"], pricePerKg: 125, note: "निवडक दर्जा", emoji: "🫘" },
+  { id: "onion", name: "कांदे", english: "Onions", varieties: ["निवडक कांदे"], pricePerKg: 0, note: "गावाकडून ताजे कांदे", emoji: "🧅", image: "/onion.png" },
+  { id: "bajra", name: "बाजरी", english: "Pearl Millet", varieties: ["निवडक बाजरी"], pricePerKg: 0, note: "पारंपरिक पौष्टिक धान्य", emoji: "🌾", image: "/bajra.png" },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["संपूर्ण हिरवे मूग"], pricePerKg: 0, note: "निवडक कडधान्य", emoji: "🫘", image: "/moong.png" },
+  { id: "harbhara", name: "हरभरा", english: "Chickpeas", varieties: ["देशी हरभरा (संपूर्ण दाणा)"], pricePerKg: 0, note: "देशी संपूर्ण हरभरा", emoji: "🫘", image: "/harbhara.png" },
 ];
+
+const productImages: Record<string, string> = {
+  wheat: "/wheat.png", rice: "/rice.png", jowar: "/jowar.png",
+  bajra: "/bajra.png", onion: "/onion.png", moong: "/moong.png",
+  harbhara: "/harbhara.png",
+};
+
+function getProductImage(product: Product): string | undefined {
+  return product.image || productImages[product.id];
+}
 
 const bagSizes = [5, 25, 50, 100];
 
@@ -99,8 +114,16 @@ export default function Home() {
       <header className="site-header">
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
-          <LanguageSwitcher /><a className="basket-link" href="#basket">🧺 {t("बास्केट")} <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
-          <a className="basket-link" href="/track">📦 {t("ऑर्डर ट्रॅक करा")}</a>
+          <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
+            <LanguageSwitcher />
+            <a className="header-action header-cart header-icon-only" href="#basket" aria-label={t("बास्केट उघडा")} title={t("बास्केट उघडा")}>
+              <svg className="nav-svg basket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M8 13l1 4m7-4-1 4M12 13v4"/></svg>
+              <b className="cart-count">{basket.reduce((n, item) => n + item.bags, 0)}</b>
+            </a>
+            <a className="header-action header-track header-track-compact header-icon-only" href="/track" aria-label={t("तुमची ऑर्डर ट्रॅक करा")} title={t("तुमची ऑर्डर ट्रॅक करा")}>
+              <svg className="nav-svg track-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="m3.5 7.7 8.5 4.4 8.5-4.4M12 12v9"/><path d="m8.5 6.2 8.8 4.5"/></svg>
+            </a>
+          </nav>
         </div>
       </header>
 
@@ -114,7 +137,7 @@ export default function Home() {
       <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>{t("निवडक धान्य")}</strong><small>{t("विविध पारंपरिक वाण")}</small></p></div><div><span>⚖️</span><p><strong>{t("तुमच्या गरजेनुसार")}</strong><small>5–100 {t("किलो")} pack</small></p></div><div><span>🏡</span><p><strong>{t("घरपोच सेवा")}</strong><small>{t("पत्त्यानुसार पुष्टी")}</small></p></div></div></section>
 
       <section className="section container" id="products"><div className="section-heading"><div><span className="eyebrow">{t("आमची निवड")}</span><h2>{t("घरासाठी चांगले धान्य")}</h2><p>{t("वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.")}</p></div><span className="product-count">{products.length} {t("उत्पादने")}</span></div>
-        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><span className="product-emoji">{product.emoji}</span><span className="quality-tag">{t("निवडक धान्य")}</span></div><div className="product-content"><div className="product-title"><div><h3>{language === "en" ? product.english : language === "hi" ? t(product.name) : product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>{t("किंमत निश्चित करायची")}</small>}</div></div><p className="product-note">{t(product.note)}</p><label htmlFor={"variety-" + product.id}>{t("वाण निवडा")}</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety}>{variety}</option>)}</select><label htmlFor={"size-" + product.id}>{t("बॅगचे वजन")}</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} {t("किलो")}</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>{t("किंमत लवकरच")}</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा"  : t("किंमत बाकी")}</button></div></div></article>)}</div>
+        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}>{getProductImage(product) ? <img className="product-image" src={getProductImage(product)} alt={product.name} onError={(event) => { event.currentTarget.style.display = "none"; const fallback = event.currentTarget.parentElement?.querySelector(".image-unavailable"); if (fallback instanceof HTMLElement) fallback.style.display = "grid"; }} /> : null}<span className="image-unavailable" aria-label={product.name + " फोटो उपलब्ध नाही"}>फोटो उपलब्ध नाही</span><span className="quality-tag">{t("निवडक धान्य")}</span></div><div className="product-content"><div className="product-title"><div><h3>{language === "en" ? product.english : language === "hi" ? t(product.name) : product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>{t("किंमत निश्चित करायची")}</small>}</div></div><p className="product-note">{t(product.note)}</p><label htmlFor={"variety-" + product.id}>{t("वाण निवडा")}</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety}>{variety}</option>)}</select><label htmlFor={"size-" + product.id}>{t("बॅगचे वजन")}</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} {t("किलो")}</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>{t("किंमत लवकरच")}</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा"  : t("किंमत बाकी")}</button></div></div></article>)}</div>
       </section>
 
       <section className="basket-section" id="basket"><div className="container basket-layout"><div><span className="eyebrow">{t("तुमची खरेदी")}</span><h2>{t("तुमची बास्केट")}</h2><p className="muted">{t("बॅगची संख्या + / − करून बदलू शकता.")}</p>{basket.length === 0 ? <div className="empty-basket"><span>🧺</span><strong>{t("तुमची बास्केट रिकामी आहे")}</strong><p>{t("आवडते धान्य निवडून बास्केटमध्ये जोडा.")}</p><a href="#products">{t("धान्य पाहा")} →</a></div> : <div className="basket-items">{basket.map((item) => <div className="basket-item" key={item.key}><div className="mini-grain">{item.product.emoji}</div><div className="basket-item-info"><strong>{language === "en" ? item.product.english : language === "hi" ? t(item.product.name) : item.product.name} — {item.variety}</strong><small>{item.bagSize} किलो बॅग · ₹{item.product.pricePerKg}/किलो</small><b>₹{item.bagSize * item.bags * item.product.pricePerKg}</b></div><div className="stepper"><button aria-label={t("कमी करा")} onClick={() => changeBags(item.key, -1)}>−</button><span>{item.bags}</span><button aria-label={t("वाढवा")} onClick={() => changeBags(item.key, 1)}>＋</button></div></div>)}</div>}</div>
