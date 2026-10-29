@@ -140,7 +140,37 @@ export default function Home() {
         <aside className="summary-card"><h3>{t("ऑर्डरचा तपशील")}</h3><div className="summary-line"><span>{t("एकूण वजन")}</span><strong>{totalKg} किलो</strong></div><div className="summary-line"><span>{t("धान्याची किंमत")}</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div className="summary-line"><span>{t("डिलिव्हरी")}</span><strong>{delivery === 0 ? "₹0" : "₹" + delivery}</strong></div><div className="summary-line total-line"><span>{t("एकूण रक्कम")}</span><strong>₹{total.toLocaleString("en-IN")}</strong></div><p className="summary-note">{t("₹1,500 किंवा अधिक खरेदीवर अंदाजित मोफत डिलिव्हरी. अंतिम शुल्क फोनवर कळवले जाईल.")}</p><button className="primary-button full-button" disabled={!basket.length} onClick={() => setCheckoutOpen(!checkoutOpen)}>{checkoutOpen ? t("फॉर्म बंद करा") : t("ऑर्डर पुढे न्या")} →</button>
           {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">{t("तुमचे नाव")}</label><input id="customer-name" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder={t("पूर्ण नाव")} /><label htmlFor="customer-phone">{t("मोबाईल नंबर")}</label><input id="customer-phone" inputMode="numeric" maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder={t("10 अंकी नंबर")} /><label htmlFor="customer-address">{t("पूर्ण पत्ता")}</label><textarea id="customer-address" rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder={t("घर क्रमांक, परिसर, शहर, पिनकोड")} /><p className="cod-note">{t("पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.")}</p><button className="primary-button full-button" disabled={sending} onClick={placeOrder}>{sending ? t("ऑर्डर नोंदवत आहे...") : t("ऑर्डर निश्चित करा")}</button></div>}
         </aside></div></section>
-      <footer className="footer"><div className="container footer-inner"><a className="brand footer-brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo footer-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a><p>{t("शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.")}</p><small>© {new Date().getFullYear()} Gaav2Ghar. सर्व हक्क राखीव.</small></div></footer>
+      <footer className="footer" id="contact">
+        <div className="container footer-grid">
+          <section className="footer-about">
+            <a className="footer-wordmark" href="#home" aria-label="Gaav2Ghar home">🌾 Gaav2Ghar</a>
+            <p>{t("शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.")}</p>
+            <span className="footer-trust">🌱 {t("गावाकडून घरापर्यंत विश्वासाने")}</span>
+          </section>
+          <section className="footer-column">
+            <h3>{t("ग्राहकांसाठी")}</h3>
+            <a href="#products">{t("धान्य आणि किंमती")}</a>
+            <a href="#basket">{t("ऑर्डर कशी करावी")}</a>
+            <a href="/track">{t("ऑर्डर ट्रॅक करा")}</a>
+            <a href="#contact-help">{t("मदत आणि संपर्क")}</a>
+          </section>
+          <section className="footer-column">
+            <h3>{t("ऑर्डर मदत")}</h3>
+            <p>{t("ऑर्डर दिल्यानंतर आमची टीम फोनवर पुष्टी करेल.")}</p>
+            <p>{t("डिलिव्हरी शुल्क आणि उपलब्धता पत्त्यानुसार कळवली जाईल.")}</p>
+            <a href="#basket">{t("ऑर्डरविषयी प्रश्न? बास्केटकडे जा")} →</a>
+          </section>
+          <section className="footer-column footer-contact" id="contact-help">
+            <h3>{t("आमच्याशी संपर्क करा")}</h3>
+            <p className="footer-contact-item"><span aria-hidden="true">📞</span><span><strong>{t("हेल्पलाइन")}</strong><small>{process.env.NEXT_PUBLIC_SUPPORT_PHONE || t("नंबर लवकरच अपडेट होईल")}</small></span></p>
+            {process.env.NEXT_PUBLIC_SUPPORT_PHONE ? <a className="footer-contact-action" href={`tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE.replace(/[^+\d]/g, "")}`}>{t("आता कॉल करा")} ↗</a> : null}
+            <p className="footer-contact-item"><span aria-hidden="true">✉️</span><span><strong>{t("ईमेल सपोर्ट")}</strong><small>{process.env.NEXT_PUBLIC_SUPPORT_EMAIL || t("ईमेल लवकरच अपडेट होईल")}</small></span></p>
+            {process.env.NEXT_PUBLIC_SUPPORT_EMAIL ? <a className="footer-contact-action" href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}>{t("ईमेल पाठवा")} ↗</a> : null}
+            <a className="footer-help-link" href="/track">📦 {t("ऑर्डर ट्रॅकिंग / ऑर्डरची मदत")}</a>
+          </section>
+        </div>
+        <div className="container footer-bottom"><small>© {new Date().getFullYear()} Gaav2Ghar. {t("सर्व हक्क राखीव.")}</small><div><a href="#home">{t("होम")}</a><a href="#products">{t("धान्य")}</a><a href="/track">{t("ऑर्डर ट्रॅकिंग")}</a></div></div>
+      </footer>
       <nav className="mobile-bottom-nav" aria-label="मुख्य नेव्हिगेशन">
         <a className="mobile-nav-item active" href="#home"><span>⌂</span><small>{t("होम")}</small></a>
         <a className="mobile-nav-item" href="#products"><span>🌾</span><small>{t("धान्य")}</small></a>
