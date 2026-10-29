@@ -193,3 +193,24 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
  .action-chevron{display:none}
 }
 @media(max-width:380px){.brand-logo{max-width:142px}.header-actions{grid-template-columns:.8fr 1fr 1fr}.action-copy strong{font-size:10px}.action-copy small{font-size:9px}.action-icon{width:26px;height:26px;font-size:15px}}
+
+
+/* Compact icon-led header requested for the customer storefront */
+.header-icon-only{position:relative;justify-content:center;width:54px;min-width:54px;padding:7px;background:#fff}
+.nav-svg{display:block;width:25px;height:25px;color:var(--green-dark);flex:0 0 auto}
+.header-icon-only .cart-count{position:absolute;top:-6px;right:-6px;min-width:21px;height:21px;padding:0 5px;border:2px solid #fff;font-size:10px}
+.header-track-compact{justify-content:center;gap:7px;min-width:94px;padding:8px 12px}
+.track-label{font-size:13px;font-weight:700;color:var(--green-dark);white-space:nowrap}
+.language-switcher{gap:5px;padding:0 8px;min-width:82px;justify-content:center}
+.language-switcher select{min-width:42px;width:42px;max-width:42px;padding:2px 0;font-size:12px;text-align:center}
+@media(max-width:760px){
+ .header-actions{grid-template-columns:74px 54px minmax(76px,1fr)}
+ .language-switcher{min-width:0;width:74px;gap:3px;padding:0 5px}
+ .language-switcher select{width:38px;min-width:38px;max-width:38px;font-size:12px}
+ .header-icon-only{width:48px;min-width:48px;min-height:46px}
+ .nav-svg{width:24px;height:24px}
+ .header-track-compact{min-width:0;min-height:46px;padding:6px 10px;gap:7px}
+ .track-label{font-size:12px}
+ .action-copy,.action-chevron{display:none}
+}
+@media(max-width:380px){.header-actions{grid-template-columns:68px 48px minmax(70px,1fr)}.language-switcher{width:68px}.language-switcher select{width:36px;min-width:36px;max-width:36px}.track-label{font-size:11px}.header-track-compact{padding:6px 7px}}
