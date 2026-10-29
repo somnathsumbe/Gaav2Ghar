@@ -157,23 +157,25 @@ export default function Home() {
         <div className="container footer-grid">
           <section className="footer-about">
             <a className="footer-wordmark" href="#home" aria-label="Gaav2Ghar home">🌾 Gaav2Ghar</a>
-            <p>{t("शेतकरी आणि तुमच्या स्वयंपाकघरातील विश्वासाचा दुवा.")}</p>
-            <span className="footer-trust">🌱 {t("गावाकडून घरापर्यंत विश्वासाने")}</span>
+            <p>{t("गावाकडची गुणवत्ता, तुमच्या घरापर्यंत.")}</p>
+            <span className="footer-trust">🌱 {t("विश्वास • गुणवत्ता • घरपोच सेवा")}</span>
           </section>
           <section className="footer-column">
-            <h3>{t("ग्राहकांसाठी")}</h3><a href="#products">{t("धान्य आणि किंमती")}</a><a href="#basket">{t("ऑर्डर कशी करावी")}</a><a href="/track">{t("ऑर्डर ट्रॅक करा")}</a><a href="#contact-help">{t("मदत आणि संपर्क")}</a>
-          </section>
-          <section className="footer-column">
-            <h3>{t("ऑर्डर मदत")}</h3><p>{t("ऑर्डर दिल्यानंतर आमची टीम फोनवर पुष्टी करेल.")}</p><p>{t("डिलिव्हरी शुल्क आणि उपलब्धता पत्त्यानुसार कळवली जाईल.")}</p><a href="#basket">{t("ऑर्डरविषयी प्रश्न? बास्केटकडे जा")} →</a>
+            <h3>{t("जलद दुवे")}</h3>
+            <a href="#products">{t("धान्य आणि किंमती")}</a>
+            <a href="#basket">{t("ऑर्डर कशी करावी")}</a>
+            <a href="/track">{t("ऑर्डर ट्रॅक करा")}</a>
           </section>
           <section className="footer-column footer-contact" id="contact-help">
-            <h3>{t("आमच्याशी संपर्क करा")}</h3>
-            <p className="footer-contact-item"><span aria-hidden="true">📞</span><span><strong>{t("हेल्पलाइन")}</strong><small>9028787219</small></span></p><a className="footer-contact-action" href="tel:+919028787219">{t("आता कॉल करा")} ↗</a>
-            <p className="footer-contact-item"><span aria-hidden="true">✉️</span><span><strong>{t("ईमेल सपोर्ट")}</strong><small>somasumbe@gmail.com</small></span></p><a className="footer-contact-action" href="mailto:somasumbe@gmail.com">{t("ईमेल पाठवा")} ↗</a>
-            <a className="footer-help-link" href="/track">📦 {t("ऑर्डर ट्रॅकिंग / ऑर्डरची मदत")}</a>
+            <h3>{t("संपर्क")}</h3>
+            <a className="footer-contact-link" href="tel:+919028787219"><span aria-hidden="true">☎</span><span>9028787219</span></a>
+            <a className="footer-contact-link" href="mailto:somasumbe@gmail.com"><span aria-hidden="true">✉</span><span>somasumbe@gmail.com</span></a>
           </section>
         </div>
-        <div className="container footer-bottom"><small>© {new Date().getFullYear()} Gaav2Ghar. {t("सर्व हक्क राखीव.")}</small><div><a href="#home">{t("होम")}</a><a href="#products">{t("धान्य")}</a><a href="/track">{t("ऑर्डर ट्रॅक करा")}</a><a href="mailto:somasumbe@gmail.com">{t("संपर्क")}</a></div></div>
+        <div className="container footer-bottom">
+          <small>© {new Date().getFullYear()} Gaav2Ghar · {t("सर्व हक्क राखीव.")}</small>
+          <a href="#home">{t("वर जा")} ↑</a>
+        </div>
       </footer>
       <nav className="mobile-bottom-nav" aria-label="मुख्य नेव्हिगेशन">
         <a className="mobile-nav-item active" href="#home"><span>⌂</span><small>{t("होम")}</small></a>
