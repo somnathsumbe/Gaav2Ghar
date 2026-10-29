@@ -135,13 +135,6 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy"><span className="eyebrow">{t("मातीचा सुगंध • विश्वासाची चव")}</span><h1>{t("गावाकडचे धान्य,")}<br /><em>{t("आता तुमच्या घरी.")}</em></h1><p>{t("निवडक धान्य, पारंपरिक वाण आणि सोपी घरपोच ऑर्डर. तुमच्या कुटुंबासाठी योग्य धान्य निवडा.")}</p><a className="primary-button" href="#products">{t("धान्य निवडा")} <span>↓</span></a><div className="trust-row"><span>✓ {t("सोपी ऑर्डर")}</span><span>✓ {t("स्पष्ट किंमत")}</span><span>✓ {t("फोनवर पुष्टी")}</span></div></div>
-          <div className="hero-art"><div className="sun"></div><div className="hero-emoji">🌾</div><div className="grain-badge"><strong>{t("थेट गावातून")}</strong><span>{t("घरापर्यंत काळजीपूर्वक")}</span></div></div>
-        </div>
-      </section>
-
       <section className="banner-carousel container" aria-label={t("Gaav2Ghar विशेष बॅनर")}>
         <div className="banner-slide" key={activeBanner}>
           <div className="banner-copy"><span className="banner-kicker">{t(bannerSlides[activeBanner].kicker)}</span><h2>{t(bannerSlides[activeBanner].title)}</h2><p>{t(bannerSlides[activeBanner].description)}</p><a className="banner-cta" href="#products">{t("धान्य निवडा")} <span aria-hidden="true">→</span></a></div>
