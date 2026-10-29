@@ -1,11 +1,17 @@
+# Dependencies
 node_modules/
-dist/
-.next/
-.env
-.env.local
-.env.*.local
 
-# Editor and OS files
-.vscode/
+# Next.js build output
+.next/
+out/
+
+# Local environment variables (keep .env.example tracked)
+.env*
+!.env.example
+
+# Logs and local files
+*.log
 .DS_Store
-Thumbs.db
+
+# TypeScript cache
+*.tsbuildinfo
