@@ -99,8 +99,11 @@ export default function Home() {
       <header className="site-header">
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/gaav2ghar-logo.png" alt="Gaav2Ghar logo" /></a>
-          <LanguageSwitcher /><a className="basket-link" href="#basket">🧺 {t("बास्केट")} <b>{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
-          <a className="basket-link" href="/track">📦 {t("ऑर्डर ट्रॅक करा")}</a>
+          <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
+            <LanguageSwitcher />
+            <a className="header-action header-cart" href="#basket"><span className="action-icon" aria-hidden="true">🧺</span><span className="action-copy"><strong>{t("माझी बास्केट")}</strong><small>{basket.reduce((n, item) => n + item.bags, 0)} {t("बॅग")}</small></span><b className="cart-count">{basket.reduce((n, item) => n + item.bags, 0)}</b></a>
+            <a className="header-action header-track" href="/track"><span className="action-icon" aria-hidden="true">📦</span><span className="action-copy"><strong>{t("ऑर्डर ट्रॅकिंग")}</strong><small>{t("ऑर्डरची स्थिती पहा")}</small></span><span className="action-chevron" aria-hidden="true">›</span></a>
+          </nav>
         </div>
       </header>
 
