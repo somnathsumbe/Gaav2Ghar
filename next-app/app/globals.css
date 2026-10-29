@@ -214,3 +214,9 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
  .action-copy,.action-chevron{display:none}
 }
 @media(max-width:380px){.header-actions{grid-template-columns:68px 48px minmax(70px,1fr)}.language-switcher{width:68px}.language-switcher select{width:36px;min-width:36px;max-width:36px}.track-label{font-size:11px}.header-track-compact{padding:6px 7px}}
+
+/* Icon-only order tracking: tooltip via native title on hover/focus */
+.header-track-compact.header-icon-only{width:54px;min-width:54px;padding:7px;justify-content:center}
+.header-track-compact.header-icon-only .track-label{display:none}
+.header-track-compact.header-icon-only:hover,.header-track-compact.header-icon-only:focus-visible{background:var(--green-soft);border-color:#c9d9c7}
+@media(max-width:760px){.header-track-compact.header-icon-only{width:48px;min-width:48px;min-height:46px;padding:6px}}
