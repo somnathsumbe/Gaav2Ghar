@@ -15,6 +15,9 @@ const seedProducts: ProductSeed[] = [
   { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱", active: true },
   { id: "bajri", name: "बाजरी", english: "Bajri", varieties: ["पांढरी बाजरी", "करडी बाजरी"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
   { id: "onion", name: "कांदे", english: "Onions", varieties: ["लाल कांदे"], pricePerKg: 0, note: "गावाकडचे कांदे", emoji: "🧅", active: true },
+  { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["सुरती", "इंद्रायणी"], pricePerKg: 0, note: "घरच्या जेवणाची चव", emoji: "🍚", active: true },
+  { id: "toor-dal", name: "तूर डाळ", english: "Toor Dal", varieties: ["पिवळी तूर डाळ"], pricePerKg: 0, note: "दैनंदिन वापरासाठी", emoji: "🫘", active: true },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवे मूग"], pricePerKg: 0, note: "पौष्टिक कडधान्य", emoji: "🌱", active: true },
 ];
 
 function authorized(request: Request) {
@@ -38,8 +41,8 @@ export async function GET() {
     const connection = await openDb();
     client = connection.client;
     const collection = connection.db.collection("products");
-    // Keep only the products currently offered in the storefront. Mark legacy records inactive so they disappear from customer and admin product lists without deleting order history.
-    await collection.updateMany({ id: { $in: ["rice", "moong", "toor-dal"] } }, { $set: { active: false, updatedAt: new Date() } });
+    // Restore products that the previous GET handler automatically hid. Do not mutate availability on reads; admins own the active flag.
+    await collection.updateMany({ id: { $in: ["rice", "moong", "toor-dal"] }, active: false }, { $set: { active: true, updatedAt: new Date() } });
     await collection.bulkWrite(seedProducts.map((product) => ({
       updateOne: { filter: { id: product.id }, update: { $setOnInsert: { ...product, createdAt: new Date(), updatedAt: new Date() } }, upsert: true },
     })));
