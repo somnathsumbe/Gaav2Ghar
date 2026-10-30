@@ -25,12 +25,12 @@ function productImage(product: Product) {
   const key = (product.id + " " + product.name + " " + product.english).toLowerCase();
   if (/onion|kanda|कांद/.test(key)) return "/onion.png";
   if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajra.png";
-  if (/jowar|jawar|ज्वारी/.test(key)) return "/jowar.png";
+  if (/jowar|jawar|ज्वारी/.test(key)) return "/jawar.png";
   if (/wheat|gahu|गहू/.test(key)) return "/wheat.png";
-  if (/moong|mung|मुग/.test(key)) return "/moong.png";
-  if (/rice|tandul|तांदूळ/.test(key)) return "/rice.png";
+  if (/moong|mung|मुग/.test(key)) return "/harbhara.png";
+  if (/rice|tandul|तांदूळ/.test(key)) return "/wheat.png";
   if (/chickpea|harbhara|हरभरा/.test(key)) return "/harbhara.png";
-  return "/gaav2ghar-logo.png";
+  return "/logo.png";
 }
 
 type BasketItem = { key: string; product: Product; variety: string; bagSize: number; bags: number };
@@ -38,6 +38,7 @@ type BasketItem = { key: string; product: Product; variety: string; bagSize: num
 export default function Home() {
   const { language, t } = useAppLanguage();
   const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [activeBanner, setActiveBanner] = useState(0);
   useEffect(() => {
     const timer = window.setInterval(() => setActiveBanner((current) => (current + 1) % 5), 5500);
     return () => window.clearInterval(timer);
@@ -57,7 +58,6 @@ export default function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
   const [sending, setSending] = useState(false);
-  const [activeBanner, setActiveBanner] = useState(0);
   const bannerSlides = [
     { kicker: "शेतकऱ्यांचा विश्वास", title: "गावाकडचे गहू, घरच्या पोळ्यांसाठी", description: "निवडक गहू आणि पारंपरिक वाण तुमच्या घरापर्यंत.", image: "/wheat.png", emoji: "🌾", alt: "गव्हाचे दाणे" },
     { kicker: "पारंपरिक पौष्टिकता", title: "ज्वारी — रोजच्या जेवणाची चांगली निवड", description: "तुमच्या गरजेनुसार पॅक निवडा आणि सहज ऑर्डर करा.", image: "/jowar.png", emoji: "🌱", alt: "ज्वारीचे दाणे" },

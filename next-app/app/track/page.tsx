@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import LanguageSwitcher, { useAppLanguage } from "../components/LanguageSwitcher";
 
 type TrackedOrder = {
@@ -52,7 +53,7 @@ export default function TrackPage() {
   return (
     <main style={{ minHeight: "100vh", background: "#faf8f1", padding: "28px 16px 60px", color: "#202820" }}>
       <div className="container" style={{ maxWidth: 760, margin: "0 auto" }}>
-        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3"><a href="/" style={{ color: "#1f5b3b", fontWeight: 700 }}>← Gaav2Ghar Home</a><LanguageSwitcher /></div>
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3"><Link href="/" style={{ color: "#1f5b3b", fontWeight: 700 }}>← Gaav2Ghar Home</Link><LanguageSwitcher /></div>
         <section style={{ marginTop: 24, background: "#fff", border: "1px solid #e5e7dc", borderRadius: 18, padding: 24 }}>
           <p style={{ color: "#647164", marginBottom: 4 }}>Gaav2Ghar • {t("Order Tracking")}</p>
           <h1 style={{ marginTop: 0 }}>{t("तुमची ऑर्डर कुठपर्यंत आली?")}</h1>
