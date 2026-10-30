@@ -14,8 +14,13 @@ type Product = {
 };
 
 const defaultProducts: Product[] = [
+  { id: "onion", name: "कांदे", english: "Onions", varieties: ["लाल कांदे"], pricePerKg: 40, note: "गावाकडचे कांदे", emoji: "🧅" },
   { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "शरबती", "बन्सी"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
   { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
+  { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["सुरती", "इंद्रायणी"], pricePerKg: 0, note: "घरच्या जेवणाची चव", emoji: "🍚" },
+  { id: "toor-dal", name: "तूर डाळ", english: "Toor Dal", varieties: ["पिवळी तूर डाळ"], pricePerKg: 0, note: "दैनंदिन वापरासाठी", emoji: "🫘" },
+  { id: "bajri", name: "बाजरी", english: "Bajri", varieties: ["पांढरी बाजरी", "करडी बाजरी"], pricePerKg: 100, note: "पारंपरिक बाजरी", emoji: "🌾" },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवे मूग"], pricePerKg: 0, note: "पौष्टिक कडधान्य", emoji: "🌱" },
 ];
 
 const bagSizes = [5, 25, 50, 100];
