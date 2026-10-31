@@ -27,7 +27,7 @@ function authorized(request: Request) {
   return isValidAdminSession(part ? decodeURIComponent(part.slice(ADMIN_COOKIE_NAME.length + 1)) : undefined);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const db = await getDatabase();
     // Admin catalogue is the source of truth. Do not seed missing products on reads:
