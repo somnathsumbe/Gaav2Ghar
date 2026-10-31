@@ -33,7 +33,7 @@ export default function TrackPage() {
   async function track(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!orderId.trim() && !phone.trim()) { setMessage("Order ID किंवा मोबाईल नंबर यापैकी एक टाका."); return; }
-    if (phone && !/^[6-9]\\d{9}$/.test(phone)) { setMessage("योग्य 10 अंकी मोबाईल नंबर टाका."); return; }
+    if (phone && !/^[6-9]\d{9}$/.test(phone)) { setMessage("योग्य 10 अंकी मोबाईल नंबर टाका."); return; }
     setLoading(true);
     setMessage("");
     setOrder(null);
