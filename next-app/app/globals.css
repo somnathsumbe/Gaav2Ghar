@@ -93,7 +93,7 @@ button,.primary-button,.add-button,.basket-link,.mobile-nav-item,.mobile-cart-bu
 .header-icon-only:hover,.header-icon-only:focus-visible{background:var(--green-soft,#e9f1e7);border-color:#c9d9c7}
 .nav-svg{width:25px;height:25px;display:block}
 .header-icon-only .cart-count{position:absolute;top:-6px;right:-6px;display:grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border:2px solid #fff;border-radius:99px;background:var(--green,#174d32);color:#fff;font-size:10px}
-.language-switcher select{min-width:42px;width:42px;max-width:42px;text-align:center;font-size:12px}
+.language-switcher select{min-width:76px;width:76px;max-width:76px;text-align:center;font-size:12px}
 @media(max-width:760px){.header-actions{gap:8px}.header-icon-only{width:44px;min-width:44px;height:44px;padding:6px}.nav-svg{width:23px;height:23px}}
 
 
