@@ -136,6 +136,23 @@ export default function AdminPage() {
         .total{font-size:19px;font-weight:800;color:#1f5b3b}
         .empty{text-align:center;padding:38px 12px;color:#657267}
         @media(max-width:700px){.order{grid-template-columns:1fr}.panel{padding:15px}.admin-shell{padding:16px 10px 40px}}
+        .admin-shell{background:linear-gradient(180deg,#f7f8f4 0%,#eef2eb 100%)}
+        .admin-top{padding:18px 20px;background:#fff;border:1px solid #e5eadf;border-radius:18px;box-shadow:0 8px 24px #183e2409}
+        .admin-top h1{font-weight:800;letter-spacing:-.6px;color:#183b29}
+        .order{align-items:start;transition:border-color .2s,box-shadow .2s}
+        .order:hover{border-color:#b9cbb6;box-shadow:0 8px 22px #183e240d}
+        .order select{min-width:0}
+        .items li{margin:6px 0;line-height:1.55}
+        .login-panel{box-shadow:0 18px 48px #183e2412}
+        @media(max-width:700px){
+          .admin-top{padding:15px;align-items:flex-start}
+          .admin-top>div:last-child{width:100%}
+          .admin-top>div:last-child>*{flex:1 1 auto}
+          .order{padding:14px;gap:12px}
+          .toolbar{align-items:stretch}
+          .toolbar select{max-width:none;width:100%}
+          .admin-shell{padding-bottom:32px}
+        }
       `}</style>
       <div className="admin-wrap">
         {!authenticated ? (
