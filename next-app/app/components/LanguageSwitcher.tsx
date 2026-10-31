@@ -119,6 +119,7 @@ const dictionary: Record<string, Record<AppLanguage, string>> = {
   "तुमची ऑर्डर कुठपर्यंत आली?": { mr: "तुमची ऑर्डर कुठपर्यंत आली?", hi: "आपकी ऑर्डर कहाँ तक पहुँची?", en: "Where is your order now?" },
   "ऑर्डरची पुष्टी झाल्यानंतर मिळालेला order ID आणि ऑर्डर देताना वापरलेला मोबाईल नंबर टाका.": { mr: "ऑर्डरची पुष्टी झाल्यानंतर मिळालेला order ID आणि ऑर्डर देताना वापरलेला मोबाईल नंबर टाका.", hi: "ऑर्डर आईडी और ऑर्डर देते समय इस्तेमाल किया गया मोबाइल नंबर दर्ज करें।", en: "Enter your order ID and the mobile number used when placing the order." },
   "नोंदणीकृत मोबाईल नंबर": { mr: "नोंदणीकृत मोबाईल नंबर", hi: "रजिस्टर्ड मोबाइल नंबर", en: "Registered mobile number" },
+  "नोंदणीकृत मोबाईल नंबर टाकल्यास सुरू असलेल्या सर्व ऑर्डर दिसतील. ऑर्डर ID टाकल्यास त्या ऑर्डरची स्थिती दिसेल.": { mr: "नोंदणीकृत मोबाईल नंबर टाकल्यास सुरू असलेल्या सर्व ऑर्डर दिसतील. ऑर्डर ID टाकल्यास त्या ऑर्डरची स्थिती दिसेल.", hi: "रजिस्टर्ड मोबाइल नंबर डालने पर सभी चालू ऑर्डर दिखेंगी। ऑर्डर ID डालने पर उसी ऑर्डर की स्थिति दिखेगी।", en: "Enter your registered mobile number to view all ongoing orders. Enter an Order ID to view that specific order status." },
   "ऑर्डर तपासा": { mr: "ऑर्डर तपासा", hi: "ऑर्डर देखें", en: "Track order" },
   "तपासत आहे...": { mr: "तपासत आहे...", hi: "जाँच हो रही है...", en: "Checking..." },
   "सध्याची स्थिती:": { mr: "सध्याची स्थिती:", hi: "वर्तमान स्थिति:", en: "Current status:" },
@@ -222,7 +223,7 @@ export function translate(text: string, language: AppLanguage): string {
 }
 
 export function useAppLanguage() {
-  const [language, setLanguageState] = useState<AppLanguage>("mr");
+  const [language, setLanguageState] = useState<AppLanguage>("en");
   useEffect(() => {
     const stored = window.localStorage.getItem("gaav2ghar-language");
     if (stored === "mr" || stored === "hi" || stored === "en") setLanguageState(stored);
