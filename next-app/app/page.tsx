@@ -14,23 +14,25 @@ type Product = {
 };
 
 const defaultProducts: Product[] = [
-  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा", "लाल कांदा"], pricePerKg: 0, note: "गावाकडचे ताजे कांदे", emoji: "🧅" },
-  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "बन्सी", "शरबती"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
-  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी", "मालदांडी", "दगडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
-  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["देशी", "हायब्रीड", "मोठ्या दाण्याची", "बारीक दाण्याची"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾" },
-  { id: "moong", name: "मूग", english: "Moong", varieties: ["बारीक दाणा", "मोठा दाणा"], pricePerKg: 0, note: "निवडक मूग", emoji: "🫘" },
+  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा","लाल कांदा"], pricePerKg: 0, note: "गावाकडचे ताजे कांदे", emoji: "🧅" },
+  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन गहू","बन्सी गहू","शरबती गहू","GW 496 गहू","श्रीराम-11 गहू"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
+  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["मालदांडी ज्वारी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
+  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["पायनियर बाजरी*","68 बाजरी*","मोहदया बाजरी*"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾" },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवा अख्खा मूग"], pricePerKg: 0, note: "निवडक मूग", emoji: "🫘" },
+  { id: "tur", name: "तूर", english: "Tur", varieties: ["पांढरी तूर"], pricePerKg: 0, note: "निवडक तूर", emoji: "🫘" },
 ];
 
 const bagSizes = [5, 25, 50, 100];
 
 // Select a category-specific image so every variety of the same grain shares its correct photo.
-function productImage(product: Product) {
+function productImage(product: Product) {\n  // Image is selected only from the main category ID; changing a variety never changes the photo.
   const key = (product.id + " " + product.name + " " + product.english).toLowerCase();
   if (/onion|kanda|कांद/.test(key)) return "/onion.png";
   if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajra.png";
   if (/jowar|jawar|ज्वारी/.test(key)) return "/jawar.png";
   if (/wheat|gahu|गहू/.test(key)) return "/wheat.png";
   if (/moong|mung|मूग|मुग/.test(key)) return "/moong.png";
+  if (/tur|तूर/.test(key)) return "/tur.png";
   if (/rice|tandul|तांदूळ/.test(key)) return "/wheat.png";
   if (/chickpea|harbhara|हरभरा/.test(key)) return "/harbhara.png";
   return "/logo.png";
@@ -54,8 +56,8 @@ export default function Home() {
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  const [selected, setSelected] = useState<Record<string, string>>({ onion: "गावठी कांदा", wheat: "लोकवन", jowar: "पांढरी", bajri: "देशी", moong: "बारीक दाणा" });
-  const [sizes, setSizes] = useState<Record<string, number>>({ onion: 5, wheat: 5, jowar: 5, bajri: 5, moong: 5 });
+  const [selected, setSelected] = useState<Record<string, string>>({ onion: "गावठी कांदा", wheat: "लोकवन गहू", jowar: "मालदांडी ज्वारी", bajri: "पायनियर बाजरी*", moong: "हिरवा अख्खा मूग", tur: "पांढरी तूर" });
+  const [sizes, setSizes] = useState<Record<string, number>>({ onion: 5, wheat: 5, jowar: 5, bajri: 5, moong: 5, tur: 5 });
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [notice, setNotice] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
