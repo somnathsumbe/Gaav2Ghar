@@ -32,11 +32,15 @@ export default function TrackPage() {
 
   async function track(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!orderId.trim() && !phone.trim()) { setMessage("Order ID किंवा मोबाईल नंबर यापैकी एक टाका."); return; }
+    if (phone && !/^[6-9]\\d{9}$/.test(phone)) { setMessage("योग्य 10 अंकी मोबाईल नंबर टाका."); return; }
     setLoading(true);
     setMessage("");
     setOrder(null);
     try {
-      const params = new URLSearchParams({ orderId: orderId.trim().toUpperCase(), phone });
+      const params = new URLSearchParams();
+      if (orderId.trim()) params.set("orderId", orderId.trim().toUpperCase());
+      if (phone.trim()) params.set("phone", phone.trim());
       const response = await fetch("/api/orders/track?" + params.toString(), { cache: "no-store" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Tracking माहिती मिळाली नाही.");
@@ -57,12 +61,12 @@ export default function TrackPage() {
         <section style={{ marginTop: 24, background: "#fff", border: "1px solid #e5e7dc", borderRadius: 18, padding: 24 }}>
           <p style={{ color: "#647164", marginBottom: 4 }}>Gaav2Ghar • {t("Order Tracking")}</p>
           <h1 style={{ marginTop: 0 }}>{t("तुमची ऑर्डर कुठपर्यंत आली?")}</h1>
-          <p>{t("ऑर्डरची पुष्टी झाल्यानंतर मिळालेला order ID आणि ऑर्डर देताना वापरलेला मोबाईल नंबर टाका.")}</p>
+          <p>{t("Order ID किंवा ऑर्डर देताना वापरलेला मोबाईल नंबर यापैकी कोणतीही एक माहिती टाकून ऑर्डर ट्रॅक करा.")}</p>
           <form onSubmit={track}>
-            <label htmlFor="track-order" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>{t("Order ID")}</label>
-            <input id="track-order" value={orderId} onChange={(e) => setOrderId(e.target.value.toUpperCase())} placeholder={t("उदा. G2G-...")} required maxLength={90} style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
-            <label htmlFor="track-phone" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>{t("नोंदणीकृत मोबाईल नंबर")}</label>
-            <input id="track-phone" inputMode="numeric" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder={t("10 अंकी नंबर")} required style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
+            <label htmlFor="track-order" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>{t("Order ID (ऐच्छिक)")}</label>
+            <input id="track-order" value={orderId} onChange={(e) => setOrderId(e.target.value.toUpperCase())} placeholder={t("Order ID टाका (किंवा मोबाईल नंबर)")} maxLength={90} style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
+            <label htmlFor="track-phone" style={{ display: "block", fontWeight: 700, marginTop: 14 }}>{t("मोबाईल नंबर (ऐच्छिक)")}</label>
+            <input id="track-phone" inputMode="numeric" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder={t("10 अंकी नंबर (किंवा Order ID)")} maxLength={10} style={{ width: "100%", padding: 12, border: "1px solid #ccd7ca", borderRadius: 9 }} />
             <button disabled={loading} style={{ marginTop: 16, width: "100%", border: 0, borderRadius: 9, padding: 13, background: "#1f5b3b", color: "#fff", fontWeight: 700 }}>{loading ? t("तपासत आहे...") : t("ऑर्डर तपासा")}</button>
           </form>
           {message && <p role="status" style={{ background: "#fff0ed", padding: 12, borderRadius: 8 }}>{message}</p>}
