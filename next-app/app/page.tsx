@@ -28,15 +28,15 @@ const bagSizes = [5, 25, 50, 100];
 function productImage(product: Product) {
   // Image is selected only from the main category ID; changing a variety never changes the photo.
   const key = (product.id + " " + product.name + " " + product.english).toLowerCase();
-  if (/onion|kanda|कांद/.test(key)) return "/onion.png";
-  if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajra.png";
-  if (/jowar|jawar|ज्वारी/.test(key)) return "/jawar.png";
-  if (/wheat|gahu|गहू/.test(key)) return "/wheat.png";
-  if (/moong|mung|मूग|मुग/.test(key)) return "/moong.png.png";
-  if (/tur|तूर/.test(key)) return "/tur.png.png";
-  if (/rice|tandul|तांदूळ/.test(key)) return "/wheat.png";
-  if (/chickpea|harbhara|हरभरा/.test(key)) return "/harbhara.png";
-  return "/logo.png";
+  if (/onion|kanda|कांद/.test(key)) return "/kanda.avif";
+  if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajari.avif";
+  if (/jowar|jawar|ज्वारी/.test(key)) return "/jawar.avif";
+  if (/wheat|gahu|गहू/.test(key)) return "/gahu.avif";
+  if (/moong|mung|मूग|मुग/.test(key)) return "/moong.png.avif";
+  if (/tur|तूर/.test(key)) return "/tur.png.avif";
+  if (/rice|tandul|तांदूळ/.test(key)) return "/gahu.avif";
+  if (/chickpea|harbhara|हरभरा/.test(key)) return "/harbhara.avif";
+  return "/logo.avif";
 }
 
 type BasketItem = { key: string; product: Product; variety: string; bagSize: number; bags: number };
@@ -77,11 +77,11 @@ export default function Home() {
   const [customer, setCustomer] = useState({ name: "", phone: "", address: "" });
   const [sending, setSending] = useState(false);
   const bannerSlides = [
-    { kicker: "शेतकऱ्यांचा विश्वास", title: "गावाकडचे गहू, घरच्या पोळ्यांसाठी", description: "निवडक गहू आणि पारंपरिक वाण तुमच्या घरापर्यंत.", image: "/wheat.png", emoji: "🌾", alt: "गव्हाचे दाणे" },
-    { kicker: "पारंपरिक पौष्टिकता", title: "ज्वारी — रोजच्या जेवणाची चांगली निवड", description: "तुमच्या गरजेनुसार पॅक निवडा आणि सहज ऑर्डर करा.", image: "/jowar.png", emoji: "🌱", alt: "ज्वारीचे दाणे" },
-    { kicker: "गावचा अस्सल स्वाद", title: "बाजरी आणि पारंपरिक धान्य", description: "गावाकडच्या चवीची आठवण प्रत्येक जेवणात.", image: "/bajra.png", emoji: "🌿", alt: "बाजरीचे दाणे" },
-    { kicker: "रोजच्या स्वयंपाकासाठी", title: "कांदेही मिळवा सोप्या पद्धतीने", description: "घरच्या गरजेची निवड करा आणि ऑर्डरची माहिती सहज मिळवा.", image: "/onion.png", emoji: "🧅", alt: "ताजे कांदे" },
-    { kicker: "सोपी घरपोच खरेदी", title: "तुमचे धान्य, तुमच्या पसंतीचा पॅक", description: "5, 25, 50 किंवा 100 किलोचे पॅक निवडा.", image: "/wheat.png", emoji: "🧺", alt: "घरासाठी धान्याचे पॅक" },
+    { kicker: "शेतकऱ्यांचा विश्वास", title: "गावाकडचे गहू, घरच्या पोळ्यांसाठी", description: "निवडक गहू आणि पारंपरिक वाण तुमच्या घरापर्यंत.", image: "/gahu.avif", emoji: "🌾", alt: "गव्हाचे दाणे" },
+    { kicker: "पारंपरिक पौष्टिकता", title: "ज्वारी — रोजच्या जेवणाची चांगली निवड", description: "तुमच्या गरजेनुसार पॅक निवडा आणि सहज ऑर्डर करा.", image: "/jawar.avif", emoji: "🌱", alt: "ज्वारीचे दाणे" },
+    { kicker: "गावचा अस्सल स्वाद", title: "बाजरी आणि पारंपरिक धान्य", description: "गावाकडच्या चवीची आठवण प्रत्येक जेवणात.", image: "/bajari.avif", emoji: "🌿", alt: "बाजरीचे दाणे" },
+    { kicker: "रोजच्या स्वयंपाकासाठी", title: "कांदेही मिळवा सोप्या पद्धतीने", description: "घरच्या गरजेची निवड करा आणि ऑर्डरची माहिती सहज मिळवा.", image: "/kanda.avif", emoji: "🧅", alt: "ताजे कांदे" },
+    { kicker: "सोपी घरपोच खरेदी", title: "तुमचे धान्य, तुमच्या पसंतीचा पॅक", description: "5, 25, 50 किंवा 100 किलोचे पॅक निवडा.", image: "/gahu.avif", emoji: "🧺", alt: "घरासाठी धान्याचे पॅक" },
   ];
 
   const totalKg = useMemo(() => basket.reduce((sum, item) => sum + item.bagSize * item.bags, 0), [basket]);
@@ -139,7 +139,7 @@ export default function Home() {
       <div className="topbar"><div className="container topbar-inner"><span>🌿 {t("शेतकऱ्यांकडून तुमच्या घरापर्यंत")}</span><span>📞 {t("ऑर्डरनंतर फोनवर पुष्टी")}</span></div></div>
       <header className="site-header">
         <div className="container header-inner">
-          <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/logo.png" alt="Gaav2Ghar logo" /></a>
+          <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/logo.avif" alt="Gaav2Ghar logo" /></a>
           <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
             <LanguageSwitcher />
             <a className="basket-link header-icon-only" href="#basket" aria-label={t("बास्केट उघडा")} title={t("बास्केट उघडा")}>
