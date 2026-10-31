@@ -25,7 +25,8 @@ const defaultProducts: Product[] = [
 const bagSizes = [5, 25, 50, 100];
 
 // Select a category-specific image so every variety of the same grain shares its correct photo.
-function productImage(product: Product) {\n  // Image is selected only from the main category ID; changing a variety never changes the photo.
+function productImage(product: Product) {
+  // Image is selected only from the main category ID; changing a variety never changes the photo.
   const key = (product.id + " " + product.name + " " + product.english).toLowerCase();
   if (/onion|kanda|कांद/.test(key)) return "/onion.png";
   if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajra.png";
