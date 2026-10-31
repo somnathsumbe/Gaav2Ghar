@@ -42,6 +42,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
@@ -129,11 +132,46 @@ export default function AdminPage() {
     setMessage("Logout झाले.");
   }
 
-  const filtered = orders.filter((order) => filter === "all" || (order.status || "pending_confirmation") === filter);
+  const filtered = orders.filter((order) => {
+    const statusMatch = filter === "all" || (order.status || "pending_confirmation") === filter;
+    const q = search.trim().toLowerCase();
+    const searchMatch = !q || [order.orderId, order.customer?.name, order.customer?.phone, order.customer?.address].some(v => String(v || "").toLowerCase().includes(q));
+    const dateMatch = !dateFilter || (order.createdAt ? new Date(order.createdAt).toISOString().slice(0,10) === dateFilter : false);
+    return statusMatch && searchMatch && dateMatch;
+  });
+  const revenue = orders.filter(o => o.status !== "cancelled").reduce((sum,o)=>sum+(Number(o.total)||0),0);
+  const pendingCount = orders.filter(o => (o.status || "pending_confirmation")==="pending_confirmation").length;
+  const deliveredCount = orders.filter(o => o.status==="delivered").length;
+  const totalKg = orders.reduce((sum,o)=>sum+(o.items||[]).reduce((n,i)=>n+(Number(i.quantityKg)||Number(i.bagSizeKg)*Number(i.bags)||0),0),0);
 
   return (
     <main className="admin-shell container-fluid">
       <style jsx>{`
+        .admin-shell{min-height:100vh;background:#f4f6f8;padding:0;display:flex;color:#203126}
+        .sidebar{position:fixed;inset:0 auto 0 0;width:260px;background:#123e25;color:#fff;padding:22px 16px;z-index:50;display:flex;flex-direction:column;transition:transform .25s}
+        .brand{display:flex;align-items:center;gap:10px;padding:0 10px 28px;font-size:21px;font-weight:800}.brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:white;color:#1b6a39}
+        .menu-label{padding:0 12px;margin:8px 0;color:#a8c1ad;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+        .side-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;color:#d8e5da;text-decoration:none;font-size:13px;font-weight:650;margin:2px 0}.side-link:hover,.side-link.active{background:#ffffff20;color:#fff;box-shadow:inset 3px 0 #9ed5a6}
+        .side-spacer{flex:1}.sidebar-overlay{display:none}.main-content{margin-left:260px;width:calc(100% - 260px);min-width:0}
+        .top-header{height:68px;position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e5e9e5;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+        .header-left,.header-actions{display:flex;align-items:center;gap:12px;min-width:0}.icon-button{width:40px;height:40px;border:1px solid #e4e9e3;border-radius:12px;background:#f8faf7;color:#35543d;display:grid;place-items:center;padding:0}
+        .profile{display:flex;align-items:center;gap:10px;border-left:1px solid #e5e9e5;padding-left:14px}.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#1f6a3a;color:white;font-weight:800}
+        .content{padding:26px 28px 50px;max-width:1600px;margin:0 auto}.page-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}.page-heading h1{font-size:clamp(23px,3vw,31px);font-weight:800;color:#183b29;margin:0 0 5px}
+        .muted{color:#748075;margin:0}.action-row{display:flex;gap:9px;flex-wrap:wrap}.btn-brand{background:#1b5e35;color:#fff;border:1px solid #1b5e35;border-radius:10px;padding:10px 15px;font-weight:700;text-decoration:none}.btn-soft{background:#fff;color:#31533a;border:1px solid #dce5da;border-radius:10px;padding:10px 15px;font-weight:700}
+        .kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.kpi{background:#fff;border:1px solid #e7ece5;border-radius:15px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;box-shadow:0 4px 16px #142d1a08}
+        .kpi-label{font-size:12px;font-weight:700;color:#69776b}.kpi-value{font-size:clamp(20px,2vw,26px);font-weight:850;color:#203b29;margin:6px 0 2px}.kpi-note{font-size:11px;color:#89938a}.kpi-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:20px;background:#e9f4e9;color:#28723d;flex:none}
+        .panel{background:#fff;border:1px solid #e5ebe3;border-radius:16px;padding:18px;box-shadow:0 5px 18px #142d1a08}.filter-grid{display:grid;grid-template-columns:minmax(220px,1.7fr) minmax(170px,.9fr) minmax(150px,.7fr) auto;gap:10px;align-items:center}.field{width:100%;min-height:43px;border:1px solid #dce4da;border-radius:10px;padding:9px 12px;background:#fff;color:#263a2b;min-width:0}
+        .orders-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:24px 0 14px}.orders-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.order-card{background:#fff;border:1px solid #e5ebe3;border-radius:16px;padding:18px;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 16px #142d1a08}
+        .order-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:1px solid #edf0eb;padding-bottom:13px}.order-id{font-size:16px;font-weight:850;color:#263d2c;overflow-wrap:anywhere}.order-meta{font-size:11px;color:#89938a;margin-top:5px}
+        .status-pill{font-size:10px;font-weight:800;border-radius:99px;padding:6px 9px;background:#fff5dc;color:#946b09;white-space:nowrap}.status-pill.confirmed,.status-pill.packed{background:#e9f2ff;color:#245e9a}.status-pill.out_for_delivery{background:#e8f5fb;color:#16708b}.status-pill.delivered{background:#e7f5e9;color:#24713a}.status-pill.cancelled{background:#fff0ed;color:#ad3c2b}
+        .customer-box{background:#f8faf7;border-left:3px solid #5a9664;border-radius:9px;padding:11px 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}.customer-detail{font-size:12px;color:#59665b;overflow-wrap:anywhere}.customer-detail strong{color:#273b2b}
+        .item-list{display:grid;gap:7px}.item-row{display:flex;justify-content:space-between;gap:10px;background:#f8f9f7;border:1px solid #edf0eb;border-radius:9px;padding:8px 10px;font-size:11px;color:#536155}.item-row strong{color:#2d4031}
+        .order-footer{border-top:1px solid #edf0eb;padding-top:13px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}.order-footer label{display:block;font-size:11px;color:#748075;font-weight:700;margin-bottom:5px}.order-total{text-align:right;font-size:20px;font-weight:850;color:#1c6637;white-space:nowrap}
+        .message{padding:12px 14px;border-radius:10px;background:#edf4e9;margin:14px 0;overflow-wrap:anywhere}.empty{background:#fff;border:1px dashed #d7e0d4;border-radius:14px;text-align:center;padding:40px 14px;color:#718071;grid-column:1/-1}
+        @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.orders-grid{grid-template-columns:1fr}.filter-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:760px){.sidebar{transform:translateX(-100%)}.sidebar.show{transform:translateX(0)}.sidebar-overlay.show{display:block;position:fixed;inset:0;background:#0d2014a0;z-index:40}.main-content{margin-left:0;width:100%}.top-header{height:60px;padding:0 14px}.content{padding:18px 12px 36px}.profile-copy{display:none}.profile{padding-left:8px}.filter-grid{grid-template-columns:1fr 1fr}.filter-grid .search-field{grid-column:1/-1}.kpi{padding:14px}.customer-box{grid-template-columns:1fr}.order-footer{grid-template-columns:1fr}.order-total{text-align:left}.page-heading .action-row{width:100%}.page-heading .action-row>*{flex:1;text-align:center}}
+        @media(max-width:390px){.kpi-grid{gap:9px}.kpi{padding:11px}.kpi-icon{width:35px;height:35px;font-size:16px}.kpi-value{font-size:19px}.filter-grid{grid-template-columns:1fr}.filter-grid .search-field{grid-column:auto}.order-card{padding:14px}.order-card-top{flex-direction:column}.status-pill{align-self:flex-start}}
+
         .admin-shell{min-height:100vh;background:#f5f7f2;padding:28px 16px 60px;color:#203126}
         .admin-wrap{max-width:1180px;margin:0 auto}
         .admin-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
@@ -191,39 +229,55 @@ export default function AdminPage() {
           </section>
         ) : (
           <>
-            <header className="admin-top">
-              <div><p className="muted">Gaav2Ghar • {t("Order Management")}</p><h1>{t("ऑर्डर व्यवस्थापन")}</h1><p className="muted">{t("शेवटच्या 200 ऑर्डर्स")} • {orders.length} {t("ऑर्डर्स")}</p></div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><LanguageSwitcher /><a href="/admin/products" className="secondary" style={{ display: "inline-flex", alignItems: "center", borderRadius: 9, padding: "11px 15px", fontWeight: 700 }}>{t("उत्पादने व किंमत")}</a><button className="btn btn-outline-success" onClick={() => void loadOrders()} disabled={loading}>↻ Refresh</button><button className="btn btn-danger" onClick={() => void logout()}>Logout</button></div>
-            </header>
-            {message && <p className="message" role="status">{message}</p>}
-            <section className="panel card shadow-sm border-0">
-              <div className="toolbar"><h2 style={{ margin: 0 }}>{t("Customer Orders")}</h2><select aria-label="Status filter" value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">{t("सर्व ऑर्डर्स")}</option>{statuses.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select></div>
-              {loading && orders.length === 0 ? <p className="empty">{t("ऑर्डर्स लोड होत आहेत...")}</p> : filtered.length === 0 ? <p className="empty">{t("या filter मध्ये ऑर्डर्स नाहीत.")}</p> : (
-                <div className="order-list">
-                  {filtered.map((order) => (
-                    <article className="order" key={order.orderId}>
-                      <div>
-                        <h2>{order.orderId}</h2>
-                        <p className="detail"><strong>{t("ग्राहक:")}</strong> {order.customer?.name || "—"}</p>
-                        <p className="detail"><strong>मोबाईल:</strong> {order.customer?.phone || "—"}</p>
-                        <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>
-                        <p className="detail"><strong>PIN Code:</strong> {order.customer?.pinCode || "—"}</p>
-                        <p className="detail"><strong>{t("ऑर्डर वेळ:")}</strong> {date(order.createdAt)}</p>
-                        <ul className="items">{(order.items || []).map((item, index) => <li key={index}>{item.product || "धान्य"} — {item.variety || "—"}; {item.bagSizeKg || 0} किलो × {item.bags || 0} बॅग = {item.quantityKg || (Number(item.bagSizeKg) * Number(item.bags)) || 0} किलो</li>)}</ul>
-                        <p className="detail">Payment: {order.paymentMethod || "COD"} • Delivery: {money(order.deliveryCharge)}</p>
-                        <p className="total">एकूण: {money(order.total)}</p>
-                      </div>
-                      <div>
-                        <button type="button" className="secondary" style={{ width: "100%", marginBottom: 12 }} onClick={() => printInvoice(order)}>🧾 Generate / Print Bill</button>
-                        <label htmlFor={"status-" + order.orderId}>Order Status / {t("सध्याची स्थिती:")}</label>
-                        <select id={"status-" + order.orderId} value={order.status || "pending_confirmation"} onChange={(event) => void updateStatus(order.orderId, event.target.value)}>{statuses.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
-                        <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Status बदलल्यावर database मध्ये save होईल.</p>
-                      </div>
+            <aside className={"sidebar " + (sidebarOpen ? "show" : "")}>
+              <div className="brand"><span className="brand-mark">🌾</span><span>Gaav2Ghar</span></div>
+              <div className="menu-label">Main Menu</div>
+              <a className="side-link" href="/admin">▦ <span>Dashboard</span></a>
+              <a className="side-link active" href="/admin">▤ <span>Order Management</span></a>
+              <a className="side-link" href="/admin/products">▣ <span>Products &amp; Pricing</span></a>
+              <a className="side-link" href="/admin">♙ <span>Customers</span></a>
+              <a className="side-link" href="/admin">↗ <span>Sales Analytics</span></a>
+              <div className="side-spacer"/>
+              <div className="menu-label">Account</div>
+              <button className="side-link" onClick={() => void logout()} style={{background:"transparent",border:0,textAlign:"left"}}>⇥ <span>Logout</span></button>
+            </aside>
+            <button aria-label="Close navigation" className={"sidebar-overlay " + (sidebarOpen ? "show" : "")} onClick={() => setSidebarOpen(false)} />
+            <div className="main-content">
+              <header className="top-header">
+                <div className="header-left"><button className="icon-button" aria-label="Toggle menu" onClick={() => setSidebarOpen((open) => !open)}>☰</button><span style={{fontWeight:700,color:"#536456"}}>Order Management</span></div>
+                <div className="header-actions"><LanguageSwitcher /><button className="icon-button" aria-label="Refresh orders" title="Refresh" onClick={() => void loadOrders()} disabled={loading}>↻</button><div className="profile"><span className="avatar">A</span><span className="profile-copy"><strong style={{display:"block",fontSize:12}}>Admin Manager</strong><small style={{color:"#89938a"}}>Gaav2Ghar Hub</small></span></div></div>
+              </header>
+              <main className="content">
+                <div className="page-heading">
+                  <div><p className="muted" style={{fontSize:11,fontWeight:800,letterSpacing:".12em",textTransform:"uppercase"}}>Gaav2Ghar / Admin</p><h1>Customer Orders</h1><p className="muted" style={{fontSize:13}}>Review customer orders, update delivery status and generate invoices.</p></div>
+                  <div className="action-row"><button className="btn-soft" onClick={() => void loadOrders()} disabled={loading}>↻ Refresh</button><a className="btn-brand" href="/admin/products">＋ Manage Products</a></div>
+                </div>
+                <section className="kpi-grid" aria-label="Order metrics">
+                  <article className="kpi"><div><div className="kpi-label">Total Order Value</div><div className="kpi-value">{money(revenue)}</div><div className="kpi-note">Based on loaded orders</div></div><span className="kpi-icon">₹</span></article>
+                  <article className="kpi"><div><div className="kpi-label">Pending Confirmation</div><div className="kpi-value">{pendingCount}</div><div className="kpi-note">Requires action</div></div><span className="kpi-icon" style={{background:"#fff4dc",color:"#a9780b"}}>◷</span></article>
+                  <article className="kpi"><div><div className="kpi-label">Delivered Orders</div><div className="kpi-value">{deliveredCount}</div><div className="kpi-note">Completed orders</div></div><span className="kpi-icon" style={{background:"#e8f1ff",color:"#3569a8"}}>✓</span></article>
+                  <article className="kpi"><div><div className="kpi-label">Produce Ordered</div><div className="kpi-value">{totalKg.toLocaleString("en-IN")} kg</div><div className="kpi-note">Grains &amp; pulses</div></div><span className="kpi-icon" style={{background:"#e7f5f4",color:"#167b79"}}>▤</span></article>
+                </section>
+                <section className="panel"><div className="filter-grid">
+                  <input className="field search-field" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search Order ID, customer name or mobile..." aria-label="Search orders"/>
+                  <select className="field" aria-label="Filter by status" value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">All Order Statuses</option>{statuses.map(([value,label])=><option key={value} value={value}>{t(label)}</option>)}</select>
+                  <input className="field" type="date" aria-label="Filter by order date" value={dateFilter} onChange={(event)=>setDateFilter(event.target.value)}/>
+                  <button className="btn-soft" onClick={()=>{setSearch("");setFilter("all");setDateFilter("");}}>Clear Filters</button>
+                </div></section>
+                {message && <p className="message" role="status">{message}</p>}
+                <div className="orders-heading"><div><h2 style={{fontSize:19,fontWeight:850,margin:0,color:"#203b29"}}>Orders</h2><p className="muted" style={{fontSize:12}}>{filtered.length} of {orders.length} orders</p></div><span className="muted" style={{fontSize:12}}>Latest orders first</span></div>
+                <section className="orders-grid">
+                  {loading && orders.length===0 ? <p className="empty">Loading orders...</p> : filtered.length===0 ? <p className="empty">No orders match these filters.</p> : filtered.map((order)=>(
+                    <article className="order-card" key={order.orderId}>
+                      <div className="order-card-top"><div><div className="order-id">{order.orderId}</div><div className="order-meta">Order date: {date(order.createdAt)}</div></div><span className={"status-pill " + (order.status || "pending_confirmation")}>{statuses.find(([value])=>value===(order.status || "pending_confirmation"))?.[1] || order.status || "Pending"}</span></div>
+                      <div className="customer-box"><div className="customer-detail"><strong>Customer:</strong> {order.customer?.name || "—"}</div><div className="customer-detail"><strong>Mobile:</strong> {order.customer?.phone || "—"}</div><div className="customer-detail" style={{gridColumn:"1/-1"}}><strong>Address:</strong> {order.customer?.address || "—"}</div><div className="customer-detail"><strong>PIN Code:</strong> {order.customer?.pinCode || "—"}</div></div>
+                      <div><div style={{fontSize:11,fontWeight:800,color:"#4d5e50",marginBottom:8}}>Items Ordered ({(order.items||[]).length})</div><div className="item-list">{(order.items||[]).map((item,index)=><div className="item-row" key={index}><strong>{item.product || "Grain"} — {item.variety || "—"}</strong><span>{item.quantityKg || Number(item.bagSizeKg)*Number(item.bags) || 0} kg</span></div>)}</div></div>
+                      <div className="order-footer"><div><button type="button" className="btn-soft" style={{width:"100%",marginBottom:10}} onClick={()=>printInvoice(order)}>▤ Print Bill</button><label htmlFor={"status-"+order.orderId}>Update Order Status</label><select className="field" id={"status-"+order.orderId} value={order.status || "pending_confirmation"} onChange={(event)=>void updateStatus(order.orderId,event.target.value)}>{statuses.map(([value,label])=><option key={value} value={value}>{t(label)}</option>)}</select></div><div className="order-total">{money(order.total)}<div className="order-meta">Payment: {order.paymentMethod || "COD"}</div></div></div>
                     </article>
                   ))}
-                </div>
-              )}
-            </section>
+                </section>
+              </main>
+            </div>
           </>
         )}
       </div>
