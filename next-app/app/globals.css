@@ -263,3 +263,13 @@ main.container-fluid:has(a[href="/admin"]) form{background:#fff;border:1px solid
 main.container-fluid:has(a[href="/admin"]) input,main.container-fluid:has(a[href="/admin"]) textarea,main.container-fluid:has(a[href="/admin"]) select{min-height:44px;border:1px solid #dce4d8;border-radius:10px;padding:10px 12px;background:#fff;max-width:100%}
 main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight:700}
 @media(max-width:640px){main.container-fluid:has(a[href="/admin"]){padding:18px 10px 36px!important}main.container-fluid:has(a[href="/admin"]) form{padding:14px}main.container-fluid:has(a[href="/admin"]) input,main.container-fluid:has(a[href="/admin"]) textarea,main.container-fluid:has(a[href="/admin"]) select{font-size:16px}}
+
+
+/* Mobile product image fix: keep a real image viewport in compact horizontal cards. */
+@media(max-width:640px){
+  .product-card{grid-template-columns:112px minmax(0,1fr)!important;}
+  .product-visual{position:relative!important;width:100%!important;height:auto!important;min-height:176px!important;align-self:stretch!important;overflow:hidden!important;}
+  .product-photo{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-height:176px!important;object-fit:cover!important;opacity:1!important;visibility:visible!important;}
+  .product-emoji-fallback{display:none;}
+  .brand-logo{display:block!important;max-width:150px!important;height:46px!important;object-fit:contain!important;}
+}
