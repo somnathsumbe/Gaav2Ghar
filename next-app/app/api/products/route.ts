@@ -41,7 +41,7 @@ export async function GET() {
     client = connection.client;
     const collection = connection.db.collection("products");
     // Keep only the products currently offered in the storefront. Mark legacy records inactive so they disappear from customer and admin product lists without deleting order history.
-    await collection.updateMany({ id: { $in: ["rice"] } }, { $set: { active: false, updatedAt: new Date() } });
+    await collection.updateMany({ id: { $in: ["rice", "toor-dal"] } }, { $set: { active: false, updatedAt: new Date() } });
     await collection.bulkWrite(seedProducts.map((product) => ({
       updateOne: { filter: { id: product.id }, update: { $set: { name: product.name, english: product.english, varieties: product.varieties, note: product.note, emoji: product.emoji, active: true, updatedAt: new Date() }, $setOnInsert: { ...product, createdAt: new Date() } }, upsert: true },
     })));
