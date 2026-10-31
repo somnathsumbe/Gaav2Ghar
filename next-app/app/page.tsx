@@ -51,10 +51,21 @@ export default function Home() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "उत्पादने लोड झाली नाहीत.");
       if (active && Array.isArray(data.products)) {
-        // MongoDB is the single source of truth; discard malformed/duplicate IDs.
-        const uniqueProducts = Array.from(new Map((data.products as Product[])
-          .filter((product) => product && typeof product.id === "string" && product.id.trim())
-          .map((product) => [product.id, product])).values());
+        // Keep every active MongoDB document visible. Repair missing or duplicate
+        // client IDs so one repeated/malformed ID cannot silently hide a product.
+        const seenIds = new Set<string>();
+        const uniqueProducts = (data.products as Product[])
+          .filter((product) => product && typeof product === "object")
+          .map((product, index) => {
+            const baseId = typeof product.id === "string" && product.id.trim()
+              ? product.id.trim()
+              : "product-" + (index + 1);
+            let id = baseId;
+            let suffix = 2;
+            while (seenIds.has(id)) id = baseId + "-" + suffix++;
+            seenIds.add(id);
+            return { ...product, id, varieties: Array.isArray(product.varieties) ? product.varieties : [] };
+          });
         setProducts(uniqueProducts);
         setProductsError("");
         setSelected((current) => Object.fromEntries(uniqueProducts.map((product) => [
@@ -82,10 +93,10 @@ export default function Home() {
   const [sending, setSending] = useState(false);
   const [confirmation, setConfirmation] = useState<{ orderId: string; name: string; phone: string; showPhone: boolean } | null>(null);
   useEffect(() => {
-    if (!confirmation?.showPhone) return;
-    const timer = window.setTimeout(() => setConfirmation((current) => current ? { ...current, showPhone: false } : null), 5000);
+    if (!confirmation) return;
+    const timer = window.setTimeout(() => setConfirmation(null), 5000);
     return () => window.clearTimeout(timer);
-  }, [confirmation?.orderId, confirmation?.showPhone]);
+  }, [confirmation?.orderId]);
   const bannerSlides = [
     { kicker: "शेतकऱ्यांचा विश्वास", title: "गावाकडचे गहू, घरच्या पोळ्यांसाठी", description: "निवडक गहू आणि पारंपरिक वाण तुमच्या घरापर्यंत.", image: "/gahu.avif", emoji: "🌾", alt: "गव्हाचे दाणे" },
     { kicker: "पारंपरिक पौष्टिकता", title: "ज्वारी — रोजच्या जेवणाची चांगली निवड", description: "तुमच्या गरजेनुसार पॅक निवडा आणि सहज ऑर्डर करा.", image: "/jawar.avif", emoji: "🌱", alt: "ज्वारीचे दाणे" },
@@ -182,7 +193,7 @@ export default function Home() {
         <aside className="summary-card"><h3>{t("ऑर्डरचा तपशील")}</h3><div className="summary-line"><span>{t("एकूण वजन")}</span><strong>{totalKg} किलो</strong></div><div className="summary-line"><span>{t("धान्याची किंमत")}</span><strong>₹{subtotal.toLocaleString("en-IN")}</strong></div><div className="summary-line"><span>{t("डिलिव्हरी")}</span><strong>{delivery === 0 ? "₹0" : "₹" + delivery}</strong></div><div className="summary-line total-line"><span>{t("एकूण रक्कम")}</span><strong>₹{total.toLocaleString("en-IN")}</strong></div><p className="summary-note">{t("₹1,500 किंवा अधिक खरेदीवर अंदाजित मोफत डिलिव्हरी. अंतिम शुल्क फोनवर कळवले जाईल.")}</p><button className="primary-button full-button" disabled={!basket.length} onClick={() => setCheckoutOpen(!checkoutOpen)}>{checkoutOpen ? t("फॉर्म बंद करा") : t("ऑर्डर पुढे न्या")} →</button>
           {checkoutOpen && <div className="checkout-form"><label htmlFor="customer-name">{t("तुमचे नाव")}</label><input id="customer-name" name="name" autoComplete="name" required maxLength={100} value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder={t("पूर्ण नाव")} /><label htmlFor="customer-phone">{t("मोबाईल नंबर")}</label><input id="customer-phone" name="tel" type="tel" inputMode="numeric" autoComplete="tel" pattern="[6-9][0-9]{9}" title="योग्य 10 अंकी मोबाईल नंबर टाका" required maxLength={10} value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder={t("10 अंकी नंबर")} /><label htmlFor="customer-address">{t("पूर्ण पत्ता")}</label><textarea id="customer-address" name="address" autoComplete="street-address" required minLength={8} maxLength={500} rows={3} value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} placeholder={t("घर क्रमांक, परिसर, शहर")} /><label htmlFor="customer-pincode">{t("पिनकोड")}</label><input id="customer-pincode" name="postalCode" type="text" inputMode="numeric" autoComplete="postal-code" pattern="[1-9][0-9]{5}" title="6 अंकी योग्य पिनकोड टाका" required maxLength={6} value={customer.pinCode} onChange={(e) => setCustomer({ ...customer, pinCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} placeholder="उदा. 411001" /><p className="cod-note">{t("पेमेंट: घरपोच मिळाल्यावर (COD). ऑर्डरनंतर फोनवर पुष्टी केली जाईल.")}</p><button type="button" className="primary-button full-button" disabled={sending} onClick={() => { const name = document.getElementById("customer-name") as HTMLInputElement | null; const phone = document.getElementById("customer-phone") as HTMLInputElement | null; const address = document.getElementById("customer-address") as HTMLTextAreaElement | null; const pinCode = document.getElementById("customer-pincode") as HTMLInputElement | null; if (!name?.reportValidity() || !phone?.reportValidity() || !address?.reportValidity() || !pinCode?.reportValidity()) return; placeOrder(); }}>{sending ? t("ऑर्डर नोंदवत आहे...") : t("ऑर्डर निश्चित करा")}</button></div>}
         </aside></div></section>
-      <>{confirmation && <div className="order-confirmation-overlay" role="presentation"><section className="order-confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="order-confirm-title"><span className="confirmation-icon">✓</span><p className="confirmation-eyebrow">ऑर्डर यशस्वीरीत्या नोंदवली</p><h2 id="order-confirm-title">धन्यवाद, {confirmation.name}!</h2><p><strong>ग्राहक:</strong> {confirmation.name}</p>{confirmation.showPhone && <p><strong>मोबाईल नंबर:</strong> {confirmation.phone}</p>}<p><strong>ऑर्डर आयडी:</strong> {confirmation.orderId}</p><a href="/track">ऑर्डर ट्रॅक करा →</a><small>ही सूचना 5 सेकंदांनी बंद होईल.</small></section></div>}</>
+      <>{confirmation && <div className="order-confirmation-overlay" role="presentation"><section className="order-confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="order-confirm-title"><span className="confirmation-icon">✓</span><p className="confirmation-eyebrow">ऑर्डर यशस्वीरीत्या नोंदवली</p><h2 id="order-confirm-title">धन्यवाद, {confirmation.name}!</h2><p><strong>ग्राहक:</strong> {confirmation.name}</p><p><strong>मोबाईल नंबर:</strong> {confirmation.phone}</p><p><strong>ऑर्डर आयडी:</strong> {confirmation.orderId}</p><a href="/track">ऑर्डर ट्रॅक करा →</a><small>ही सूचना 5 सेकंदांनी बंद होईल.</small></section></div>}</>
       <footer className="footer" id="contact">
         <div className="container footer-grid">
           <section className="footer-about">
