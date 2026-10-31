@@ -175,12 +175,30 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="banner-carousel container" aria-label={t("Gaav2Ghar विशेष बॅनर")}>
-        <div className="banner-slide" key={activeBanner}>
-          <div className="banner-copy"><span className="banner-kicker">{t(bannerSlides[activeBanner].kicker)}</span><h2>{t(bannerSlides[activeBanner].title)}</h2><p>{t(bannerSlides[activeBanner].description)}</p><a className="banner-cta" href="#products">{t("धान्य निवडा")} <span aria-hidden="true">→</span></a></div>
-          <div className={"banner-visual banner-visual-" + (activeBanner + 1)}><img src={bannerSlides[activeBanner].image} alt={t(bannerSlides[activeBanner].alt)} onError={(event) => { event.currentTarget.style.display = "none"; }} /><span aria-hidden="true">{bannerSlides[activeBanner].emoji}</span><div className="banner-stamp">🌿 {t("गावाकडून घरापर्यंत")}</div></div>
+      <section className="hero-container container" aria-label={t("Gaav2Ghar मुख्य माहिती")}>
+        <div className="hero-copy">
+          <span className="hero-badge">✦ {t("शेतातून थेट तुमच्या घरापर्यंत")}</span>
+          <h1>{t("रोजच्या स्वयंपाकासाठी निवडक, अस्सल धान्य")}</h1>
+          <p>{t("गावाकडील पारंपरिक वाण निवडा. तुमच्या गरजेनुसार 5, 25, 50 किंवा 100 किलोची बॅग निवडून घरपोच ऑर्डर करा.")}</p>
+          <div className="hero-actions">
+            <a className="hero-primary" href="#products">{t("धान्य खरेदी करा")} <span>→</span></a>
+            <a className="hero-secondary" href="#basket">{t("बास्केट पाहा")}</a>
+          </div>
+          <div className="hero-proof"><span>✓ {t("निवडक पारंपरिक वाण")}</span><span>✓ {t("ऑर्डरची फोनवर पुष्टी")}</span></div>
         </div>
-        <div className="banner-controls"><button type="button" className="banner-arrow" aria-label={t("मागील बॅनर")} onClick={() => setActiveBanner((activeBanner + bannerSlides.length - 1) % bannerSlides.length)}>←</button><div className="banner-dots" role="group" aria-label={t("बॅनर निवडा")}>{bannerSlides.map((slide, index) => <button type="button" key={slide.title} className={index === activeBanner ? "banner-dot active" : "banner-dot"} aria-label={t("बॅनर क्रमांक") + " " + (index + 1)} aria-current={index === activeBanner ? "true" : undefined} onClick={() => setActiveBanner(index)} />)}</div><span className="banner-count">{String(activeBanner + 1).padStart(2, "0")} / 05</span><button type="button" className="banner-arrow" aria-label={t("पुढील बॅनर")} onClick={() => setActiveBanner((activeBanner + 1) % bannerSlides.length)}>→</button></div>
+        <aside className="hero-spotlight">
+          <span className="spotlight-label">🌾 {t("लोकप्रिय निवड")}</span>
+          <div className="spotlight-image">
+            <img src="/jawar.avif" alt={t("गावरान ज्वारी")} />
+            <span className="spotlight-origin">{t("गावाकडचे धान्य")}</span>
+          </div>
+          <div className="spotlight-details">
+            <div><small>{t("पारंपरिक धान्य")}</small><h2>{t("गावरान ज्वारी")}</h2><p>{t("तुमच्या पसंतीचा पॅक निवडा")}</p></div>
+            <button type="button" onClick={() => { const featured = products.find((product) => /jowar|jawar|ज्वारी/i.test(product.id + " " + product.name + " " + product.english)); if (featured) { setSizes((old) => ({ ...old, [featured.id]: 25 })); setSelected((old) => ({ ...old, [featured.id]: featured.varieties[0] || "" })); setBasket((old) => { const variety = featured.varieties[0] || ""; const key = featured.id + "|" + variety + "|25"; const found = old.find((item) => item.key === key); return found ? old.map((item) => item.key === key ? { ...item, bags: item.bags + 1 } : item) : [...old, { key, product: featured, variety, bagSize: 25, bags: 1 }]; }); setNotice(t("ज्वारीची 25 किलो बॅग बास्केटमध्ये जोडली!")); } else setNotice(t("ज्वारी सध्या उपलब्ध नाही.")); }}>
+              {t("25 किलो जोडा")} ＋
+            </button>
+          </div>
+        </aside>
       </section>
 
       <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>{t("निवडक धान्य")}</strong><small>{t("विविध पारंपरिक वाण")}</small></p></div><div><span>⚖️</span><p><strong>{t("तुमच्या गरजेनुसार")}</strong><small>5–100 {t("किलो")} pack</small></p></div><div><span>🏡</span><p><strong>{t("घरपोच सेवा")}</strong><small>{t("पत्त्यानुसार पुष्टी")}</small></p></div></div></section>
