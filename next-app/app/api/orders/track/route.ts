@@ -6,10 +6,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const orderId = (url.searchParams.get("orderId") || "").trim();
-  const phone = (url.searchParams.get("phone") || "").replace(/\D/g, "");
-  if (!/^G2G-[A-Z0-9-]{4,80}$/.test(orderId) || !/^[6-9]\d{9}$/.test(phone)) {
-    return NextResponse.json({ error: "योग्य order ID आणि नोंदणीकृत 10 अंकी मोबाईल नंबर टाका." }, { status: 400 });
+  const orderId = (url.searchParams.get("orderId") || "").trim().toUpperCase();
+  const phone = (url.searchParams.get("phone") || "").replace(/\\D/g, "");
+  const hasOrderId = Boolean(orderId);
+  const hasPhone = Boolean(phone);
+  if ((!hasOrderId && !hasPhone) || (hasOrderId && !/^G2G-[A-Z0-9-]{4,80}$/.test(orderId)) || (hasPhone && !/^[6-9]\\d{9}$/.test(phone))) {
+    return NextResponse.json({ error: "Order ID किंवा नोंदणीकृत 10 अंकी मोबाईल नंबर यापैकी एक टाका." }, { status: 400 });
   }
   const uri = process.env.MONGODB_URI;
   if (!uri) return NextResponse.json({ error: "Database configured नाही." }, { status: 503 });
@@ -19,11 +21,16 @@ export async function GET(request: Request) {
     client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
     await client.connect();
     const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
+    const filter = hasOrderId && hasPhone
+      ? { orderId, "customer.phone": phone }
+      : hasOrderId
+        ? { orderId }
+        : { "customer.phone": phone };
     const order = await db.collection("orders").findOne(
-      { orderId, "customer.phone": phone },
-      { projection: { _id: 0, orderId: 1, status: 1, createdAt: 1, updatedAt: 1, items: 1, total: 1 } },
+      filter,
+      { sort: { createdAt: -1 }, projection: { _id: 0, orderId: 1, status: 1, createdAt: 1, updatedAt: 1, items: 1, total: 1, "customer.name": 1 } },
     );
-    if (!order) return NextResponse.json({ error: "ऑर्डर सापडली नाही. Order ID आणि मोबाईल नंबर तपासा." }, { status: 404 });
+    if (!order) return NextResponse.json({ error: "ऑर्डर सापडली नाही. दिलेली माहिती तपासा." }, { status: 404 });
     return NextResponse.json({ ok: true, order });
   } catch (error) {
     console.error("Order tracking lookup failed", error);
