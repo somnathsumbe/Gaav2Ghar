@@ -7,10 +7,10 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const orderId = (url.searchParams.get("orderId") || "").trim().toUpperCase();
-  const phone = (url.searchParams.get("phone") || "").replace(/\\D/g, "");
+  const phone = (url.searchParams.get("phone") || "").replace(/\D/g, "");
   const hasOrderId = Boolean(orderId);
   const hasPhone = Boolean(phone);
-  if ((!hasOrderId && !hasPhone) || (hasOrderId && !/^G2G-[A-Z0-9-]{4,80}$/.test(orderId)) || (hasPhone && !/^[6-9]\\d{9}$/.test(phone))) {
+  if ((!hasOrderId && !hasPhone) || (hasOrderId && !/^G2G-[A-Z0-9-]{4,80}$/.test(orderId)) || (hasPhone && !/^[6-9]\d{9}$/.test(phone))) {
     return NextResponse.json({ error: "Order ID किंवा नोंदणीकृत 10 अंकी मोबाईल नंबर यापैकी एक टाका." }, { status: 400 });
   }
   const uri = process.env.MONGODB_URI;
