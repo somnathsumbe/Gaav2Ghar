@@ -378,3 +378,37 @@ main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight
 .order-confirmation-modal small{display:block;margin-top:18px;color:#788276}
 @keyframes confirm-fade{from{opacity:0}to{opacity:1}}@keyframes confirm-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:640px){#products .product-grid{grid-template-columns:1fr!important;gap:14px!important}#products .product-card{display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;align-items:stretch;border-radius:14px}#products .product-visual{height:100%!important;min-height:100%!important;max-height:none!important;flex:initial!important}#products .product-photo{min-height:100%!important}#products .product-content{padding:11px!important}#products .product-title h3{font-size:15px}#products .product-note{min-height:0}}
+
+
+/* Responsive header hardening: desktop, tablet and narrow mobile */
+.site-header{width:100%;isolation:isolate}
+.site-header .header-inner{display:flex;min-width:0;gap:clamp(8px,2vw,20px)}
+.site-header .brand{flex:0 1 auto;min-width:0}
+.site-header .brand-logo{max-width:min(220px,42vw);height:clamp(44px,5vw,62px)}
+.site-header .header-actions{flex:0 0 auto;min-width:0;gap:clamp(6px,1.2vw,12px)}
+.site-header .language-switcher{flex:0 0 auto;min-width:0}
+.site-header .header-icon-only{flex:0 0 auto}
+@media(max-width:480px){
+  .site-header .header-inner{height:62px;gap:6px}
+  .site-header .brand-logo{height:43px;max-width:clamp(112px,36vw,158px)}
+  .site-header .header-actions{gap:5px}
+  .site-header .language-switcher{gap:2px;padding:3px 5px;border-radius:9px}
+  .site-header .language-switcher>span{font-size:12px}
+  .site-header .language-switcher select{width:58px;min-width:58px;max-width:58px;min-height:30px;padding:2px 12px 2px 0;font-size:11px}
+  .site-header .header-icon-only{width:37px;min-width:37px;height:38px;padding:5px;border-radius:10px}
+  .site-header .nav-svg{width:20px;height:20px}
+  .site-header .header-icon-only .cart-count{top:-5px;right:-5px;min-width:18px;height:18px;font-size:9px}
+}
+@media(max-width:360px){
+  .site-header .header-inner{gap:4px}
+  .site-header .brand-logo{max-width:108px;height:39px}
+  .site-header .header-actions{gap:4px}
+  .site-header .language-switcher{padding:2px 4px}
+  .site-header .language-switcher select{width:52px;min-width:52px;max-width:52px;font-size:10px}
+  .site-header .header-icon-only{width:34px;min-width:34px;height:36px}
+  .site-header .nav-svg{width:18px;height:18px}
+}
+@media(min-width:481px) and (max-width:760px){
+  .site-header .header-inner{height:66px}
+  .site-header .brand-logo{max-width:165px;height:48px}
+}
