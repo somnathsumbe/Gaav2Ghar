@@ -14,20 +14,23 @@ type Product = {
 };
 
 const defaultProducts: Product[] = [
-  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "शरबती", "बन्सी"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
-  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
+  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा", "लाल कांदा"], pricePerKg: 0, note: "गावाकडचे ताजे कांदे", emoji: "🧅" },
+  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "बन्सी", "शरबती"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
+  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी", "मालदांडी", "दगडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
+  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["देशी", "हायब्रीड", "मोठ्या दाण्याची", "बारीक दाण्याची"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾" },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["बारीक दाणा", "मोठा दाणा"], pricePerKg: 0, note: "निवडक मूग", emoji: "🫘" },
 ];
 
 const bagSizes = [5, 25, 50, 100];
 
-// Use real repository assets for available grain photos. Rice and moong photos can be added later.
+// Select a category-specific image so every variety of the same grain shares its correct photo.
 function productImage(product: Product) {
   const key = (product.id + " " + product.name + " " + product.english).toLowerCase();
   if (/onion|kanda|कांद/.test(key)) return "/onion.png";
   if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajra.png";
   if (/jowar|jawar|ज्वारी/.test(key)) return "/jawar.png";
   if (/wheat|gahu|गहू/.test(key)) return "/wheat.png";
-  if (/moong|mung|मुग/.test(key)) return "/harbhara.png";
+  if (/moong|mung|मूग|मुग/.test(key)) return "/moong.png";
   if (/rice|tandul|तांदूळ/.test(key)) return "/wheat.png";
   if (/chickpea|harbhara|हरभरा/.test(key)) return "/harbhara.png";
   return "/logo.png";
@@ -51,8 +54,8 @@ export default function Home() {
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  const [selected, setSelected] = useState<Record<string, string>>({ wheat: "लोकवन", jowar: "पांढरी ज्वारी" });
-  const [sizes, setSizes] = useState<Record<string, number>>({ wheat: 5, jowar: 5 });
+  const [selected, setSelected] = useState<Record<string, string>>({ onion: "गावठी कांदा", wheat: "लोकवन", jowar: "पांढरी", bajri: "देशी", moong: "बारीक दाणा" });
+  const [sizes, setSizes] = useState<Record<string, number>>({ onion: 5, wheat: 5, jowar: 5, bajri: 5, moong: 5 });
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [notice, setNotice] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
