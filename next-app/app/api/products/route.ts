@@ -41,17 +41,11 @@ export async function GET() {
   try {
     const connection = await openDb();
     client = connection.client;
-    const collection = connection.db.collection("products");
-    // Restore legacy catalogue entries previously hidden by the old GET handler. Availability and admin-managed fields remain authoritative.
-    await collection.updateMany({ id: { $in: ["rice", "moong", "toor-dal"] }, active: false }, { $set: { active: true, updatedAt: new Date() } });
-    await collection.bulkWrite(seedProducts.map((product) => ({
-      updateOne: { filter: { id: product.id }, update: { $setOnInsert: { ...product, createdAt: new Date(), updatedAt: new Date() } }, upsert: true },
-    })));
-    // Apply the newly configured public prices only to products that still have no price; preserve any price already managed by Admin.
-    await collection.bulkWrite(seedProducts.filter((product) => product.pricePerKg > 0).map((product) => ({
-      updateOne: { filter: { id: product.id, $or: [{ pricePerKg: 0 }, { pricePerKg: { $exists: false } }] }, update: { $set: { pricePerKg: product.pricePerKg, updatedAt: new Date() } } },
-    })));
-    const products = await collection.find({ active: { $ne: false } }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
+    // Admin catalogue is the source of truth. Do not seed missing products on reads:
+    // deleted or never-created products must not reappear in the storefront.
+    const products = await connection.db.collection("products")
+      .find({ active: { $ne: false } }, { projection: { _id: 0 } })
+      .sort({ name: 1 }).toArray();
     return NextResponse.json({ ok: true, products });
   } catch (error) {
     console.error("Product list failed", error);
@@ -93,6 +87,31 @@ export async function PATCH(request: Request) {
   } catch (error) {
     console.error("Product save failed", error);
     return NextResponse.json({ error: "उत्पादन सेव्ह करता आले नाही." }, { status: 503 });
+  } finally {
+    await client?.close();
+  }
+}
+
+
+export async function DELETE(request: Request) {
+  if (!isAdminConfigured()) return NextResponse.json({ error: "Admin login is not configured." }, { status: 503 });
+  if (!authorized(request)) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+
+  let body: Record<string, unknown>;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
+  const id = typeof body.id === "string" ? body.id.trim() : "";
+  if (!/^[a-z0-9-]{2,40}$/.test(id)) return NextResponse.json({ error: "अवैध Product ID." }, { status: 400 });
+
+  let client: MongoClient | undefined;
+  try {
+    const connection = await openDb();
+    client = connection.client;
+    const result = await connection.db.collection("products").deleteOne({ id });
+    if (result.deletedCount === 0) return NextResponse.json({ error: "हे उत्पादन डेटाबेसमध्ये सापडले नाही." }, { status: 404 });
+    return NextResponse.json({ ok: true, id, deleted: true });
+  } catch (error) {
+    console.error("Product delete failed", error);
+    return NextResponse.json({ error: "उत्पादन delete करता आले नाही." }, { status: 503 });
   } finally {
     await client?.close();
   }
