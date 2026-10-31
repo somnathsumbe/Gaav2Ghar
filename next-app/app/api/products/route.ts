@@ -17,6 +17,8 @@ const seedProducts: ProductSeed[] = [
   { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["पायनियर बाजरी*","68 बाजरी*","मोहदया बाजरी*"], pricePerKg: 70, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
   { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवा अख्खा मूग"], pricePerKg: 89, note: "निवडक मूग", emoji: "🫘", active: true },
   { id: "tur", name: "तूर", english: "Tur", varieties: ["पांढरी तूर"], pricePerKg: 100, note: "निवडक तूर", emoji: "🫘", active: true },
+  { id: "rice", name: "तांदूळ", english: "Rice", varieties: ["सुरती", "इंद्रायणी"], pricePerKg: 0, note: "घरच्या जेवणाची चव", emoji: "🍚", active: true },
+  { id: "toor-dal", name: "तूर डाळ", english: "Toor Dal", varieties: ["पिवळी तूर डाळ"], pricePerKg: 0, note: "दैनंदिन वापरासाठी", emoji: "🫘", active: true },
 ];
 
 function authorized(request: Request) {
@@ -40,10 +42,10 @@ export async function GET() {
     const connection = await openDb();
     client = connection.client;
     const collection = connection.db.collection("products");
-    // Keep only the products currently offered in the storefront. Mark legacy records inactive so they disappear from customer and admin product lists without deleting order history.
-    await collection.updateMany({ id: { $in: ["rice", "toor-dal"] } }, { $set: { active: false, updatedAt: new Date() } });
+    // Restore legacy catalogue entries previously hidden by the old GET handler. Availability and admin-managed fields remain authoritative.
+    await collection.updateMany({ id: { $in: ["rice", "moong", "toor-dal"] }, active: false }, { $set: { active: true, updatedAt: new Date() } });
     await collection.bulkWrite(seedProducts.map((product) => ({
-      updateOne: { filter: { id: product.id }, update: { $set: { name: product.name, english: product.english, varieties: product.varieties, note: product.note, emoji: product.emoji, active: true, updatedAt: new Date() }, $setOnInsert: { ...product, createdAt: new Date() } }, upsert: true },
+      updateOne: { filter: { id: product.id }, update: { $setOnInsert: { ...product, createdAt: new Date(), updatedAt: new Date() } }, upsert: true },
     })));
     // Apply the newly configured public prices only to products that still have no price; preserve any price already managed by Admin.
     await collection.bulkWrite(seedProducts.filter((product) => product.pricePerKg > 0).map((product) => ({
