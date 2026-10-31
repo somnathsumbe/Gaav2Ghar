@@ -49,13 +49,15 @@ export default function AdminProductsPage() {
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setLoading(true); setMessage("");
+    const isNewProduct = !products.some((product) => product.id === form.id);
     const payload = { ...form, varieties: varietyText.split(",").map((v) => v.trim()).filter(Boolean) };
     try {
       const response = await fetch("/api/products", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await response.json();
       if (response.status === 401) { setAuthenticated(false); throw new Error("Session संपली. पुन्हा login करा."); }
       if (!response.ok) throw new Error(data.error || "उत्पादन सेव्ह झाले नाही.");
-      setMessage("उत्पादन सेव्ह झाले.");
+      setMessage(isNewProduct ? "नवीन उत्पादन यशस्वीरित्या जोडले गेले." : "उत्पादनातील बदल सेव्ह झाले.");
+      window.alert(isNewProduct ? "नवीन उत्पादन यशस्वीरित्या जोडले गेले!" : "उत्पादनातील बदल यशस्वीरित्या सेव्ह झाले!");
       await load();
     } catch (error) { setMessage(error instanceof Error ? error.message : "उत्पादन सेव्ह झाले नाही."); }
     finally { setLoading(false); }
