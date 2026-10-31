@@ -235,3 +235,23 @@ body{background:#fbfaf6;color:var(--ink);font-family:"DM Sans","Noto Sans Devana
   opacity: 1;
   cursor: not-allowed;
 }
+
+
+/* UI polish: consistent responsive banner, cards, controls and admin surfaces */
+@media(max-width:640px){
+  .banner-slide{min-height:0!important;padding:20px 16px 66px!important;gap:14px}
+  .banner-visual{position:relative!important;inset:auto!important;transform:none!important;width:100%!important;height:clamp(150px,48vw,210px)!important;min-height:0!important;margin:0!important;border-radius:14px!important}
+  .banner-controls{left:16px!important;right:16px!important;bottom:12px!important;justify-content:center!important}
+  .banner-copy h2{font-size:clamp(22px,6vw,29px)!important}
+  .product-grid{align-items:stretch}
+  .product-card{min-width:0}
+  .product-content select{min-width:0;max-width:100%}
+  .card-footer{gap:8px;align-items:center}
+  .card-footer>span{min-width:0}
+  .add-button{white-space:nowrap}
+  .summary-card{position:relative}
+  .checkout-form input,.checkout-form textarea{font-size:16px}
+}
+@media(min-width:641px) and (max-width:900px){.banner-slide{min-height:340px!important;padding:34px 5%!important}.banner-visual{width:40%!important;height:240px!important}}
+:where(button,a,input,select,textarea):focus-visible{outline:3px solid #a9c9a9;outline-offset:2px}
+img{max-width:100%}
