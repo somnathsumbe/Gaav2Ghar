@@ -11,11 +11,12 @@ type ProductSeed = {
 };
 
 const seedProducts: ProductSeed[] = [
-  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा", "लाल कांदा"], pricePerKg: 0, note: "गावाकडचे ताजे कांदे", emoji: "🧅", active: true },
-  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "बन्सी", "शरबती"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾", active: true },
-  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी", "मालदांडी", "दगडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱", active: true },
-  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["देशी", "हायब्रीड", "मोठ्या दाण्याची", "बारीक दाण्याची"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
-  { id: "moong", name: "मूग", english: "Moong", varieties: ["बारीक दाणा", "मोठा दाणा"], pricePerKg: 0, note: "निवडक मूग", emoji: "🫘", active: true },
+  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा","लाल कांदा"], pricePerKg: 0, note: "गावाकडचे ताजे कांदे", emoji: "🧅", active: true },
+  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन गहू","बन्सी गहू","शरबती गहू","GW 496 गहू","श्रीराम-11 गहू"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾", active: true },
+  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["मालदांडी ज्वारी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱", active: true },
+  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["पायनियर बाजरी*","68 बाजरी*","मोहदया बाजरी*"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवा अख्खा मूग"], pricePerKg: 0, note: "निवडक मूग", emoji: "🫘", active: true },
+  { id: "tur", name: "तूर", english: "Tur", varieties: ["पांढरी तूर"], pricePerKg: 0, note: "निवडक तूर", emoji: "🫘", active: true },
 ];
 
 function authorized(request: Request) {
