@@ -32,8 +32,8 @@ function productImage(product: Product) {
   if (/bajra|bajari|bajri|बाजरी/.test(key)) return "/bajra.png";
   if (/jowar|jawar|ज्वारी/.test(key)) return "/jawar.png";
   if (/wheat|gahu|गहू/.test(key)) return "/wheat.png";
-  if (/moong|mung|मूग|मुग/.test(key)) return "/moong.png";
-  if (/tur|तूर/.test(key)) return "/tur.png";
+  if (/moong|mung|मूग|मुग/.test(key)) return "/moong.png.png";
+  if (/tur|तूर/.test(key)) return "/tur.png.png";
   if (/rice|tandul|तांदूळ/.test(key)) return "/wheat.png";
   if (/chickpea|harbhara|हरभरा/.test(key)) return "/harbhara.png";
   return "/logo.png";
