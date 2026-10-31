@@ -542,3 +542,26 @@ main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight
  .spotlight-details{align-items:flex-start;flex-direction:column}
  .spotlight-details button{width:100%}
 }
+
+
+/* Storefront navigation and loading-state UX polish */
+.desktop-nav-links{display:flex;align-items:center;gap:clamp(12px,2vw,25px);margin-right:clamp(8px,1.4vw,18px)}
+.desktop-nav-links a{color:#344b39;text-decoration:none;font-size:12px;font-weight:750;white-space:nowrap;transition:color .18s ease}
+.desktop-nav-links a:hover{color:#1b5e20}
+.store-load-error{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px;border:1px solid #f0d4cb;border-radius:14px;background:#fff8f5;color:#8c3b2d}
+.store-load-error p{margin:0;font-size:13px}
+.store-load-error button{flex:none;padding:10px 15px;border:0;border-radius:9px;background:#1b5e20;color:#fff;font-size:12px;font-weight:800}
+.store-skeleton-grid{pointer-events:none}
+.store-product-skeleton{overflow:hidden;border:1px solid #e7ebe4;border-radius:18px;background:#fff}
+.skeleton-photo{height:190px;background:linear-gradient(100deg,#edf0e9 20%,#f7f8f5 38%,#edf0e9 56%);background-size:220% 100%;animation:store-shimmer 1.35s ease-in-out infinite}
+.skeleton-lines{display:grid;gap:11px;padding:18px}
+.skeleton-lines i,.skeleton-lines b{display:block;height:11px;border-radius:8px;background:#edf0e9}
+.skeleton-lines i:first-child{width:48%;height:17px}
+.skeleton-lines i:nth-child(2){width:75%}
+.skeleton-lines i:nth-child(3){width:100%;height:38px}
+.skeleton-lines b{width:58%;height:36px;margin-top:4px;background:#e2ebdf}
+@keyframes store-shimmer{to{background-position:-220% 0}}
+@media(max-width:900px){.desktop-nav-links{gap:11px;margin-right:5px}.desktop-nav-links a{font-size:11px}}
+@media(max-width:760px){.desktop-nav-links{display:none}}
+@media(max-width:640px){.store-skeleton-grid{grid-template-columns:1fr}.store-product-skeleton{display:grid;grid-template-columns:116px minmax(0,1fr);min-height:190px}.skeleton-photo{height:100%;min-height:190px}.skeleton-lines{padding:12px;align-content:center;gap:9px}.skeleton-lines i:nth-child(3){height:30px}.store-load-error{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.skeleton-photo{animation:none}}
