@@ -53,7 +53,19 @@ export default function Home() {
     let active = true;
     fetch("/api/products", { cache: "no-store" }).then(async (response) => {
       const data = await response.json();
-      if (response.ok && active && Array.isArray(data.products) && data.products.length) setProducts(data.products);
+      if (response.ok && active && Array.isArray(data.products)) {
+        setProducts(data.products);
+        setSelected((current) => Object.fromEntries(data.products.map((product: Product) => [
+          product.id,
+          current[product.id] && product.varieties.includes(current[product.id])
+            ? current[product.id]
+            : (product.varieties[0] || ""),
+        ])));
+        setSizes((current) => Object.fromEntries(data.products.map((product: Product) => [
+          product.id,
+          current[product.id] || 5,
+        ])));
+      }
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
