@@ -8,6 +8,7 @@ type OrderPayload = {
     name?: string;
     phone?: string;
     address?: string;
+    pinCode?: string;
     location?: { latitude?: number; longitude?: number; accuracy?: number } | null;
     whatsappOptIn?: boolean;
   };
