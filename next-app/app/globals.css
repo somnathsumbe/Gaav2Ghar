@@ -366,3 +366,15 @@ main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight
   .confirmation-icon { flex-basis: 36px; width: 36px; height: 36px; font-size: 19px; }
   .order-confirmation-card h3 { font-size: 18px; }
 }
+
+
+/* Checkout confirmation modal and single-column mobile catalogue */
+.order-confirmation-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;background:#102719a8;backdrop-filter:blur(5px);animation:confirm-fade .18s ease-out}
+.order-confirmation-modal{width:min(440px,100%);padding:30px 26px;text-align:center;background:#fff;border:1px solid #dce8d8;border-radius:22px;box-shadow:0 24px 80px #071b10a8;animation:confirm-pop .22s ease-out}
+.order-confirmation-modal .confirmation-icon{margin:0 auto 14px}
+.order-confirmation-modal h2{margin:6px 0 16px;color:#173a29;font-size:23px}
+.order-confirmation-modal p{margin:9px 0;color:#425344;overflow-wrap:anywhere}
+.order-confirmation-modal a{display:inline-block;margin-top:12px;color:#214f35;font-weight:800}
+.order-confirmation-modal small{display:block;margin-top:18px;color:#788276}
+@keyframes confirm-fade{from{opacity:0}to{opacity:1}}@keyframes confirm-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:640px){#products .product-grid{grid-template-columns:1fr!important;gap:14px!important}#products .product-card{display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;align-items:stretch;border-radius:14px}#products .product-visual{height:100%!important;min-height:100%!important;max-height:none!important;flex:initial!important}#products .product-photo{min-height:100%!important}#products .product-content{padding:11px!important}#products .product-title h3{font-size:15px}#products .product-note{min-height:0}}
