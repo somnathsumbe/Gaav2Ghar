@@ -264,6 +264,45 @@ main.container-fluid:has(a[href="/admin"]) input,main.container-fluid:has(a[href
 main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight:700}
 @media(max-width:640px){main.container-fluid:has(a[href="/admin"]){padding:18px 10px 36px!important}main.container-fluid:has(a[href="/admin"]) form{padding:14px}main.container-fluid:has(a[href="/admin"]) input,main.container-fluid:has(a[href="/admin"]) textarea,main.container-fluid:has(a[href="/admin"]) select{font-size:16px}}
 
+/* Professional Bootstrap admin dashboards */
+.admin-products-shell{min-height:100vh;background:linear-gradient(145deg,#f7f9f5,#edf2eb)!important;padding:24px 16px 56px!important;color:#203126}
+.admin-products-wrap{max-width:1180px;margin:0 auto}
+.admin-products-nav,.admin-products-header,.admin-card-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.admin-back-link{color:#1f5b3b;font-weight:800;text-decoration:none}
+.admin-products-header{margin:20px 0;background:#fff;border:1px solid #e3e9df;border-radius:20px;padding:22px 24px;box-shadow:0 12px 35px rgba(29,71,42,.08)}
+.admin-products-header h1{margin:4px 0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.7px;color:#183b29}
+.admin-eyebrow{display:block;color:#718270;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+.admin-product-message{padding:13px 16px;border-radius:12px;background:#eaf3e7;color:#1f5b3b}
+.admin-login-card,.admin-editor-card,.admin-product-list-card{background:#fff!important;border-radius:20px!important;padding:22px!important;box-shadow:0 14px 38px rgba(29,71,42,.09)!important;border:1px solid #e3e9df!important}
+.admin-login-card{max-width:440px;margin:10vh auto;padding:28px!important}
+.admin-card-heading{margin-bottom:18px}.admin-card-heading h2{margin:4px 0 0;color:#183b29;font-weight:800}
+.admin-product-form{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px!important;border:0!important;padding:0!important;box-shadow:none!important;background:transparent!important}
+.admin-product-form label{margin:0;color:#455348;font-size:13px;font-weight:700}
+.admin-product-form input[type="checkbox"]{width:18px;min-height:18px!important;height:18px;margin-right:7px}
+.admin-product-form label[style]{display:flex!important;align-items:center!important}
+.admin-product-list{display:grid;gap:12px}
+.admin-product-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px;border:1px solid #e3e8df;border-radius:16px;background:#fcfdfb}
+.admin-product-info{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.admin-product-info>div{min-width:0}.admin-product-info strong{color:#26382c}.admin-product-info small{color:#778176;font-size:13px}
+.admin-product-info p{margin:5px 0 7px;color:#748076;font-size:12px;overflow-wrap:anywhere}
+.admin-product-emoji{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#edf3e8;font-size:26px;flex:none}
+.admin-product-price{font-weight:800;color:#1f5b3b;margin-right:8px}
+.status-pill{display:inline-block;border-radius:999px;padding:4px 9px;background:#eaf3e7;color:#27623c;font-size:11px;font-weight:700}
+.status-pill.inactive{background:#fff0ed;color:#a83222}
+.admin-product-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.admin-products-shell .btn{min-height:42px;border-radius:10px;font-weight:700}
+.admin-products-shell input{border-radius:10px!important}
+@media(max-width:700px){
+  .admin-products-shell{padding:14px 10px 36px!important}
+  .admin-products-header{padding:16px}
+  .admin-login-card,.admin-editor-card,.admin-product-list-card{padding:16px!important;border-radius:16px!important}
+  .admin-product-form{grid-template-columns:1fr;gap:13px!important}
+  .admin-card-heading>button,.admin-card-heading>div{width:auto}
+  .admin-product-row{align-items:flex-start;flex-direction:column}
+  .admin-product-actions{width:100%;justify-content:flex-start}
+  .admin-product-actions .btn{flex:1}
+}
+
 
 /* Mobile product image fix: keep a real image viewport in compact horizontal cards. */
 @media(max-width:640px){

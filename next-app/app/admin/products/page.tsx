@@ -87,20 +87,23 @@ export default function AdminProductsPage() {
 
   async function logout() { await fetch("/api/admin/logout", { method: "POST" }); setAuthenticated(false); }
 
-  return <main className="container-fluid py-4" style={{ minHeight: "100vh", background: "#f5f7f2", color: "#203126", padding: "24px 14px 60px" }}>
-    <div style={{ maxWidth: 1050, margin: "0 auto" }}>
-      <div className="d-flex justify-content-between align-items-center flex-wrap gap-3"><a href="/admin" style={{ color: "#1f5b3b", fontWeight: 700 }}>← Admin Orders</a><LanguageSwitcher /></div>
-      <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", margin: "20px 0" }}>
-        <div><h1 style={{ margin: 0 }}>{t("उत्पादन व किंमत व्यवस्थापन")}</h1><p>{t("धान्याचे वाण, किलोचा दर आणि उपलब्धता बदला.")}</p></div>
-        {authenticated && <button onClick={() => void logout()} style={{ padding: 10 }}>Logout</button>}
+  return <main className="container-fluid admin-products-shell">
+    <div className="admin-products-wrap">
+      <div className="admin-products-nav d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <a href="/admin" className="admin-back-link">← Admin Orders</a>
+        <LanguageSwitcher />
+      </div>
+      <header className="admin-products-header">
+        <div><span className="admin-eyebrow">Gaav2Ghar Inventory</span><h1>{t("उत्पादन व किंमत व्यवस्थापन")}</h1><p className="text-secondary mb-0">{t("धान्याचे वाण, किलोचा दर आणि उपलब्धता बदला.")}</p></div>
+        {authenticated && <button className="btn btn-outline-success" onClick={() => void logout()}><span aria-hidden="true">↪</span> Logout</button>}
       </header>
-      {message && <p role="status" style={{ padding: 12, borderRadius: 8, background: "#eaf2e8" }}>{message}</p>}
-      {!authenticated ? <section className="card shadow-sm border-0" style={{ background: "#fff", padding: 20, borderRadius: 14, maxWidth: 420 }}>
+      {message && <p className="admin-product-message" role="status">{message}</p>}
+      {!authenticated ? <section className="card admin-login-card border-0">
         <h2>Admin Login</h2><form onSubmit={login}><label htmlFor="password">Admin Password</label><input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: "100%", padding: 12, margin: "8px 0 14px" }} /><button disabled={loading}>Login करा</button></form>
       </section> : <>
-        <section className="card shadow-sm border-0 mb-4" style={{ background: "#fff", padding: 20, borderRadius: 14, marginBottom: 20 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}><h2>{form.id ? t("उत्पादन बदला") : t("नवीन उत्पादन")}</h2><button type="button" onClick={newProduct}>＋ {t("नवीन उत्पादन")}</button></div>
-          <form onSubmit={save} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+        <section className="card admin-editor-card border-0 mb-4">
+          <div className="admin-card-heading"><div><span className="admin-eyebrow">Product editor</span><h2>{form.id ? t("उत्पादन बदला") : t("नवीन उत्पादन")}</h2></div><button type="button" className="btn btn-success" onClick={newProduct}>＋ {t("नवीन उत्पादन")}</button></div>
+          <form className="admin-product-form" onSubmit={save}>
             <label>Product ID (English, unique)<input value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} required maxLength={40} disabled={products.some((p) => p.id === form.id)} style={{ display: "block", width: "100%", padding: 10, marginTop: 6 }} /></label>
             <label>{t("नाव (मराठी)")}<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={80} style={{ display: "block", width: "100%", padding: 10, marginTop: 6 }} /></label>
             <label>English name<input value={form.english} onChange={(e) => setForm({ ...form, english: e.target.value })} required maxLength={80} style={{ display: "block", width: "100%", padding: 10, marginTop: 6 }} /></label>
@@ -112,12 +115,12 @@ export default function AdminProductsPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}><button disabled={loading}>{t("सेव्ह करा")}</button><button type="button" onClick={newProduct} style={{ background: "#e8f0e6", color: "#1f5b3b" }}>{t("रद्द करा")}</button></div>
           </form>
         </section>
-        <section className="card shadow-sm border-0" style={{ background: "#fff", padding: 20, borderRadius: 14 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><h2>{t("सर्व उत्पादने")} ({products.length})</h2><button type="button" onClick={() => void load()} disabled={loading}>Refresh</button></div>
-          <div style={{ display: "grid", gap: 10 }}>
-            {products.map((product) => <article key={product.id} style={{ border: "1px solid #e2e8df", borderRadius: 12, padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <div><strong>{product.emoji} {product.name} / {product.english}</strong><p style={{ margin: "5px 0", color: "#657267" }}>ID: {product.id} · वाण: {product.varieties.join(", ")}</p><strong>₹{product.pricePerKg}/किलो</strong> · {product.active === false ? t("ग्राहकांना लपवलेले") : product.pricePerKg <= 0 ? t("किंमत निश्चित करणे बाकी") : t("उपलब्ध")}</div>
-              <div style={{ display: "flex", gap: 8 }}>
+        <section className="card admin-product-list-card border-0">
+          <div className="admin-card-heading"><div><span className="admin-eyebrow">Catalogue</span><h2>{t("सर्व उत्पादने")} ({products.length})</h2></div><button className="btn btn-outline-success" type="button" onClick={() => void load()} disabled={loading}>↻ Refresh</button></div>
+          <div className="admin-product-list">
+            {products.map((product) => <article className="admin-product-row" key={product.id}>
+              <div className="admin-product-info"><span className="admin-product-emoji">{product.emoji || "🌾"}</span><div><strong>{product.name} <small>/ {product.english}</small></strong><p>ID: {product.id} · वाण: {product.varieties.join(", ")}</p><span className="admin-product-price">₹{product.pricePerKg}/किलो</span> <span className={product.active === false ? "status-pill inactive" : "status-pill"}>{product.active === false ? t("ग्राहकांना लपवलेले") : product.pricePerKg <= 0 ? t("किंमत निश्चित करणे बाकी") : t("उपलब्ध")}</span></div></div>
+              <div className="admin-product-actions">
                 <button type="button" onClick={() => edit(product)}>{t("उत्पादन बदला")}</button>
                 <button type="button" onClick={() => void removeProduct(product)} disabled={loading} style={{ background: "#fff0ed", color: "#a83222", border: "1px solid #f0c7bf", padding: "9px 12px", borderRadius: 8 }}>{t("Delete")}</button>
               </div>
