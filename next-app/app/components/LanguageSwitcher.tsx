@@ -159,8 +159,6 @@ const dictionary: Record<string, Record<AppLanguage, string>> = {
   "स्थिती उपलब्ध नाही": { mr: "स्थिती उपलब्ध नाही", hi: "स्थिति उपलब्ध नहीं", en: "Status unavailable" },
 
   "कांदा": { mr: "कांदा", hi: "प्याज़", en: "Onion" },
-  "गहू": { mr: "गहू", hi: "गेहूँ", en: "Wheat" },
-  "ज्वारी": { mr: "ज्वारी", hi: "ज्वार", en: "Jowar" },
   "बाजरी": { mr: "बाजरी", hi: "बाजरा", en: "Bajra" },
   "मूग": { mr: "मूग", hi: "मूंग", en: "Moong" },
   "गावठी कांदा": { mr: "गावठी कांदा", hi: "देसी प्याज़", en: "Local onion" },
