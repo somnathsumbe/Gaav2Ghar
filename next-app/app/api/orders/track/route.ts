@@ -28,50 +28,38 @@ export async function GET(request: Request) {
     const collection = db.collection("orders");
     const projection = { _id: 0, orderId: 1, status: 1, createdAt: 1, updatedAt: 1, "customer.name": 1 };
 
-    // An Order ID returns only its matching order and its current/final status.
+    // Match phone digits even when stored with +91, spaces, hyphens or other separators.
+    // This uses MongoDB's regular-expression query support (not newer aggregation operators).
+    const phonePattern = phone ? phone.split("").join("\\D*") : "";
+    const phoneMatch = phone ? {
+      $or: [
+        { "customer.phone": { $regex: phonePattern + "$" } },
+        { "customer.mobile": { $regex: phonePattern + "$" } },
+        { phone: { $regex: phonePattern + "$" } },
+      ],
+    } : {};
+
+    // An Order ID returns only that exact order. If a phone is also supplied,
+    // it must belong to the same order.
     if (hasOrderId) {
-      const filter = hasPhone
-        ? { orderId, "customer.phone": phone }
-        : { orderId };
-      const order = await collection.findOne(filter, { projection });
+      const order = await collection.findOne(
+        { $and: [{ orderId }, ...(hasPhone ? [phoneMatch] : [])] },
+        { projection },
+      );
       if (!order) return NextResponse.json({ error: "या माहितीनुसार ऑर्डर सापडली नाही. तपशील तपासा." }, { status: 404 });
       return NextResponse.json({ ok: true, order });
     }
 
-    // Normalize phone values in MongoDB so legacy values with +91, spaces or
-    // punctuation are matched too. Keep every order except delivered ones.
-    const orders = await collection.aggregate([
+    // Return every matching ongoing order, excluding delivered orders.
+    const orders = await collection.find(
       {
-        $addFields: {
-          _trackingPhone: {
-            $regexReplace: {
-              input: {
-                $toString: {
-                  $ifNull: ["$customer.phone", { $ifNull: ["$customer.mobile", "$phone"] }],
-                },
-              },
-              regex: "[^0-9]",
-              replacement: "",
-            },
-          },
-          _trackingStatus: {
-            $toLower: { $ifNull: ["$status", "pending_confirmation"] },
-          },
-        },
+        $and: [
+          phoneMatch,
+          { status: { $not: /^delivered$/i } },
+        ],
       },
-      { $match: { _trackingPhone: { $regex: phone + "$" }, _trackingStatus: { $ne: "delivered" } } },
-      { $sort: { createdAt: -1 } },
-      {
-        $project: {
-          _id: 0,
-          orderId: 1,
-          status: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          "customer.name": 1,
-        },
-      },
-    ]).toArray();
+      { projection },
+    ).sort({ createdAt: -1 }).toArray();
 
     if (!orders.length) {
       return NextResponse.json({ error: "या मोबाईल नंबरवर कोणतीही सुरू असलेली ऑर्डर सापडली नाही." }, { status: 404 });
