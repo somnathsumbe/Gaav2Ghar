@@ -16,7 +16,7 @@ type Order = {
   status?: string;
   createdAt?: string;
   updatedAt?: string;
-  customer?: { name?: string; phone?: string; address?: string };
+  customer?: { name?: string; phone?: string; address?: string; pinCode?: string };
   items?: OrderItem[];
   subtotal?: number;
   deliveryCharge?: number;
@@ -99,6 +99,27 @@ export default function AdminPage() {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Status update झाले नाही.");
     }
+  }
+
+  function printInvoice(order: Order) {
+    const escapeHtml = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] || char));
+    const rows = (order.items || []).map((item) => {
+      const qty = Number(item.quantityKg) || (Number(item.bagSizeKg) * Number(item.bags)) || 0;
+      const amount = qty * (Number(item.pricePerKg) || 0);
+      return `<tr><td>${escapeHtml(item.product)}<br/><small>${escapeHtml(item.variety)}</small></td><td>${escapeHtml(item.bagSizeKg)} kg × ${escapeHtml(item.bags)}</td><td>${qty} kg</td><td>₹${(Number(item.pricePerKg) || 0).toLocaleString("en-IN")}</td><td>₹${amount.toLocaleString("en-IN")}</td></tr>`;
+    }).join("");
+    const invoiceHtml = `<!doctype html><html><head><meta charset="utf-8"/><title>Invoice ${escapeHtml(order.orderId)}</title><style>
+      body{font:14px Arial,sans-serif;color:#243328;margin:32px}header{display:flex;justify-content:space-between;border-bottom:2px solid #214f35;padding-bottom:16px}h1{color:#214f35;margin:0 0 6px}.muted{color:#657267;font-size:12px}.cols{display:flex;justify-content:space-between;gap:30px;margin:24px 0}.box{flex:1;line-height:1.7}table{width:100%;border-collapse:collapse;margin-top:22px}th,td{padding:11px 8px;border-bottom:1px solid #dfe6dc;text-align:left}th{background:#edf3e8}.totals{width:280px;margin:20px 0 0 auto}.totals div{display:flex;justify-content:space-between;padding:6px}.grand{font-size:18px;font-weight:bold;border-top:2px solid #214f35;margin-top:8px;padding-top:12px!important}.footer{margin-top:45px;border-top:1px solid #ddd;padding-top:14px;text-align:center;color:#657267;font-size:12px}@media print{body{margin:15mm}button{display:none}}
+    </style></head><body><header><div><h1>Gaav2Ghar</h1><div class="muted">गावाकडचे धान्य • घरपोच सेवा</div></div><div><h2>DELIVERY INVOICE</h2><strong>${escapeHtml(order.orderId)}</strong><div class="muted">Date: ${escapeHtml(date(order.createdAt))}</div></div></header>
+    <div class="cols"><div class="box"><strong>Bill To</strong><br/>${escapeHtml(order.customer?.name)}<br/>Mobile: ${escapeHtml(order.customer?.phone)}<br/>${escapeHtml(order.customer?.address)}<br/>PIN Code: ${escapeHtml(order.customer?.pinCode || "—")}</div><div class="box"><strong>Delivery Details</strong><br/>Order Status: ${escapeHtml(order.status || "pending_confirmation")}<br/>Payment: ${escapeHtml(order.paymentMethod || "COD")}<br/>Payment Mode: Cash on Delivery</div></div>
+    <table><thead><tr><th>Product / Variety</th><th>Pack</th><th>Quantity</th><th>Rate / kg</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="totals"><div><span>Subtotal</span><strong>${money(order.subtotal)}</strong></div><div><span>Delivery</span><strong>${money(order.deliveryCharge)}</strong></div><div class="grand"><span>Total Due</span><strong>${money(order.total)}</strong></div></div>
+    <div class="footer">Thank you for choosing Gaav2Ghar. Please verify items and amount at delivery.</div><script>window.onload=()=>window.print();</script></body></html>`;
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+    if (!printWindow) { setMessage("Invoice उघडण्यासाठी browser pop-up परवानगी द्या."); return; }
+    printWindow.document.open();
+    printWindow.document.write(invoiceHtml);
+    printWindow.document.close();
   }
 
   async function logout() {
@@ -185,14 +206,14 @@ export default function AdminPage() {
                         <h2>{order.orderId}</h2>
                         <p className="detail"><strong>{t("ग्राहक:")}</strong> {order.customer?.name || "—"}</p>
                         <p className="detail"><strong>मोबाईल:</strong> {order.customer?.phone || "—"}</p>
-                        <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>
+                        <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>\n                        <p className="detail"><strong>PIN Code:</strong> {order.customer?.pinCode || "—"}</p>
                         <p className="detail"><strong>{t("ऑर्डर वेळ:")}</strong> {date(order.createdAt)}</p>
                         <ul className="items">{(order.items || []).map((item, index) => <li key={index}>{item.product || "धान्य"} — {item.variety || "—"}; {item.bagSizeKg || 0} किलो × {item.bags || 0} बॅग = {item.quantityKg || (Number(item.bagSizeKg) * Number(item.bags)) || 0} किलो</li>)}</ul>
                         <p className="detail">Payment: {order.paymentMethod || "COD"} • Delivery: {money(order.deliveryCharge)}</p>
                         <p className="total">एकूण: {money(order.total)}</p>
                       </div>
                       <div>
-                        <label htmlFor={"status-" + order.orderId}>Order Status / {t("सध्याची स्थिती:")}</label>
+                        <button type="button" className="secondary" style={{ width: "100%", marginBottom: 12 }} onClick={() => printInvoice(order)}>🧾 Generate / Print Bill</button>\n                        <label htmlFor={"status-" + order.orderId}>Order Status / {t("सध्याची स्थिती:")}</label>
                         <select id={"status-" + order.orderId} value={order.status || "pending_confirmation"} onChange={(event) => void updateStatus(order.orderId, event.target.value)}>{statuses.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
                         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Status बदलल्यावर database मध्ये save होईल.</p>
                       </div>
