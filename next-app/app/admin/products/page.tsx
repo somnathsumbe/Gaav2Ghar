@@ -61,6 +61,28 @@ export default function AdminProductsPage() {
     finally { setLoading(false); }
   }
 
+  async function removeProduct(product: Product) {
+    const confirmed = window.confirm(`"${product.name}" (${product.english}) हे उत्पादन कायमचे delete करायचे आहे का? हा बदल MongoDB मध्येही लागू होईल.`);
+    if (!confirmed) return;
+    setLoading(true); setMessage("");
+    try {
+      const response = await fetch("/api/products", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: product.id }),
+      });
+      const data = await response.json();
+      if (response.status === 401) { setAuthenticated(false); throw new Error("Session संपली. पुन्हा login करा."); }
+      if (!response.ok) throw new Error(data.error || "उत्पादन delete झाले नाही.");
+      setProducts((current) => current.filter((item) => item.id !== product.id));
+      if (form.id === product.id) newProduct();
+      setMessage("उत्पादन MongoDB मधून delete झाले.");
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "उत्पादन delete झाले नाही.");
+    } finally { setLoading(false); }
+  }
+
   async function logout() { await fetch("/api/admin/logout", { method: "POST" }); setAuthenticated(false); }
 
   return <main className="container-fluid py-4" style={{ minHeight: "100vh", background: "#f5f7f2", color: "#203126", padding: "24px 14px 60px" }}>
@@ -93,7 +115,10 @@ export default function AdminProductsPage() {
           <div style={{ display: "grid", gap: 10 }}>
             {products.map((product) => <article key={product.id} style={{ border: "1px solid #e2e8df", borderRadius: 12, padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <div><strong>{product.emoji} {product.name} / {product.english}</strong><p style={{ margin: "5px 0", color: "#657267" }}>ID: {product.id} · वाण: {product.varieties.join(", ")}</p><strong>₹{product.pricePerKg}/किलो</strong> · {product.active === false ? t("ग्राहकांना लपवलेले") : product.pricePerKg <= 0 ? t("किंमत निश्चित करणे बाकी") : t("उपलब्ध")}</div>
-              <button type="button" onClick={() => edit(product)}>{t("उत्पादन बदला")}</button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button type="button" onClick={() => edit(product)}>{t("उत्पादन बदला")}</button>
+                <button type="button" onClick={() => void removeProduct(product)} disabled={loading} style={{ background: "#fff0ed", color: "#a83222", border: "1px solid #f0c7bf", padding: "9px 12px", borderRadius: 8 }}>{t("Delete")}</button>
+              </div>
             </article>)}
           </div>
         </section>
