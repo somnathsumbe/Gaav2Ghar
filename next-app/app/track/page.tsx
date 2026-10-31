@@ -8,8 +8,6 @@ type TrackedOrder = {
   orderId: string;
   status?: string;
   createdAt?: string;
-  total?: number;
-  items?: Array<{ product?: string; variety?: string; quantityKg?: number; bagSizeKg?: number; bags?: number }>;
 };
 const statusLabels: Record<string, string> = {
   pending_confirmation: "ऑर्डरची पुष्टी बाकी",
@@ -68,6 +66,7 @@ export default function TrackPage() {
           </form>
           {message && <p role="status" style={{ background: "#fff0ed", padding: 12, borderRadius: 8, marginTop: 14 }}>{message}</p>}
         </section>
+        {orders.length > 0 && <p style={{ marginTop: 18, fontWeight: 700, color: "#1f5b3b" }}>{t("सुरू असलेल्या ऑर्डर्स")}: {orders.length}</p>}
         {orders.map((order) => {
           const currentStep = order.status ? steps.indexOf(order.status) : -1;
           return <section key={order.orderId} style={{ marginTop: 18, background: "#fff", border: "1px solid #e5e7dc", borderRadius: 18, padding: 24 }}>
@@ -80,9 +79,6 @@ export default function TrackPage() {
                 return <div key={step} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 10, background: done ? "#eaf2e8" : "#f6f7f3", color: done ? "#1f5b3b" : "#7b847b" }}><span style={{ fontWeight: 800 }}>{done ? "✓" : index + 1}</span><strong>{t(statusLabels[step])}</strong></div>;
               })}
             </div>}
-            <h3>{t("ऑर्डरमधील वस्तू")}</h3>
-            {(order.items || []).map((item, index) => <p key={index}>{item.product || "धान्य"} — {item.variety || ""} · {item.quantityKg || (Number(item.bagSizeKg) * Number(item.bags)) || 0} किलो</p>)}
-            <p style={{ fontSize: 20, fontWeight: 800, color: "#1f5b3b" }}>एकूण: ₹{Number(order.total || 0).toLocaleString("en-IN")}</p>
           </section>;
         })}
       </div>
