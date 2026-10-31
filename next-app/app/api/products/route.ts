@@ -45,7 +45,11 @@ export async function GET() {
     await collection.bulkWrite(seedProducts.map((product) => ({
       updateOne: { filter: { id: product.id }, update: { $set: { name: product.name, english: product.english, varieties: product.varieties, note: product.note, emoji: product.emoji, active: true, updatedAt: new Date() }, $setOnInsert: { ...product, createdAt: new Date() } }, upsert: true },
     })));
-    // Apply the newly configured public prices only to products that still have no price; preserve any price already managed by Admin.\n    await collection.bulkWrite(seedProducts.filter((product) => product.pricePerKg > 0).map((product) => ({\n      updateOne: { filter: { id: product.id, $or: [{ pricePerKg: 0 }, { pricePerKg: { $exists: false } }] }, update: { $set: { pricePerKg: product.pricePerKg, updatedAt: new Date() } } },\n    })));\n    const products = await collection.find({ active: { $ne: false } }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
+    // Apply the newly configured public prices only to products that still have no price; preserve any price already managed by Admin.
+    await collection.bulkWrite(seedProducts.filter((product) => product.pricePerKg > 0).map((product) => ({
+      updateOne: { filter: { id: product.id, $or: [{ pricePerKg: 0 }, { pricePerKg: { $exists: false } }] }, update: { $set: { pricePerKg: product.pricePerKg, updatedAt: new Date() } } },
+    })));
+    const products = await collection.find({ active: { $ne: false } }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
     return NextResponse.json({ ok: true, products });
   } catch (error) {
     console.error("Product list failed", error);
