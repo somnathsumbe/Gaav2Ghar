@@ -13,14 +13,7 @@ type Product = {
   emoji: string;
 };
 
-const defaultProducts: Product[] = [
-  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा","लाल कांदा"], pricePerKg: 45, note: "गावाकडचे ताजे कांदे", emoji: "🧅" },
-  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन गहू","बन्सी गहू","शरबती गहू","GW 496 गहू","श्रीराम-11 गहू"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾" },
-  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["मालदांडी ज्वारी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱" },
-  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["पायनियर बाजरी*","68 बाजरी*","मोहदया बाजरी*"], pricePerKg: 70, note: "पारंपरिक बाजरी", emoji: "🌾" },
-  { id: "moong", name: "मूग", english: "Moong", varieties: ["हिरवा अख्खा मूग"], pricePerKg: 89, note: "निवडक मूग", emoji: "🫘" },
-  { id: "tur", name: "तूर", english: "Tur", varieties: ["पांढरी तूर"], pricePerKg: 100, note: "निवडक तूर", emoji: "🫘" },
-];
+// Product catalogue is loaded only from MongoDB; never render a hard-coded fallback list.
 
 const bagSizes = [5, 25, 50, 100];
 
@@ -43,7 +36,9 @@ type BasketItem = { key: string; product: Product; variety: string; bagSize: num
 
 export default function Home() {
   const { language, t } = useAppLanguage();
-  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState("");
   const [activeBanner, setActiveBanner] = useState(0);
   useEffect(() => {
     const timer = window.setInterval(() => setActiveBanner((current) => (current + 1) % 5), 5500);
@@ -51,22 +46,31 @@ export default function Home() {
   }, []);
   useEffect(() => {
     let active = true;
-    fetch("/api/products", { cache: "no-store" }).then(async (response) => {
+    setProductsLoading(true);
+    fetch("/api/products", { cache: "no-store", headers: { "Cache-Control": "no-cache" } }).then(async (response) => {
       const data = await response.json();
-      if (response.ok && active && Array.isArray(data.products)) {
-        setProducts(data.products);
-        setSelected((current) => Object.fromEntries(data.products.map((product: Product) => [
+      if (!response.ok) throw new Error(data.error || "उत्पादने लोड झाली नाहीत.");
+      if (active && Array.isArray(data.products)) {
+        // MongoDB is the single source of truth; discard malformed/duplicate IDs.
+        const uniqueProducts = Array.from(new Map((data.products as Product[])
+          .filter((product) => product && typeof product.id === "string" && product.id.trim())
+          .map((product) => [product.id, product])).values());
+        setProducts(uniqueProducts);
+        setProductsError("");
+        setSelected((current) => Object.fromEntries(uniqueProducts.map((product) => [
           product.id,
           current[product.id] && product.varieties.includes(current[product.id])
             ? current[product.id]
             : (product.varieties[0] || ""),
         ])));
-        setSizes((current) => Object.fromEntries(data.products.map((product: Product) => [
+        setSizes((current) => Object.fromEntries(uniqueProducts.map((product) => [
           product.id,
           current[product.id] || 5,
         ])));
       }
-    }).catch(() => undefined);
+    }).catch((error) => {
+      if (active) { setProducts([]); setProductsError(error instanceof Error ? error.message : "उत्पादने लोड झाली नाहीत."); }
+    }).finally(() => { if (active) setProductsLoading(false); });
     return () => { active = false; };
   }, []);
   const [selected, setSelected] = useState<Record<string, string>>({ onion: "गावठी कांदा", wheat: "लोकवन गहू", jowar: "मालदांडी ज्वारी", bajri: "पायनियर बाजरी*", moong: "हिरवा अख्खा मूग", tur: "पांढरी तूर" });
@@ -164,7 +168,7 @@ export default function Home() {
       <section className="benefits"><div className="container benefit-grid"><div><span>🌱</span><p><strong>{t("निवडक धान्य")}</strong><small>{t("विविध पारंपरिक वाण")}</small></p></div><div><span>⚖️</span><p><strong>{t("तुमच्या गरजेनुसार")}</strong><small>5–100 {t("किलो")} pack</small></p></div><div><span>🏡</span><p><strong>{t("घरपोच सेवा")}</strong><small>{t("पत्त्यानुसार पुष्टी")}</small></p></div></div></section>
 
       <section className="section container" id="products"><div className="section-heading"><div><span className="eyebrow">{t("आमची निवड")}</span><h2>{t("घरासाठी चांगले धान्य")}</h2><p>{t("वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.")}</p></div><span className="product-count">{products.length} {t("उत्पादने")}</span></div>
-        <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><img className="product-photo" src={productImage(product)} alt={product.english + " grain"} loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; const fallback = event.currentTarget.parentElement?.querySelector(".product-emoji-fallback") as HTMLElement | null; if (fallback) fallback.style.display = "block"; }} /><span className="product-emoji product-emoji-fallback">{product.emoji}</span><span className="quality-tag">{t("निवडक धान्य")}</span></div><div className="product-content"><div className="product-title"><div><h3>{language === "en" ? product.english : language === "hi" ? t(product.name) : product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>{t("किंमत निश्चित करायची")}</small>}</div></div><p className="product-note">{t(product.note)}</p><label htmlFor={"variety-" + product.id}>{t("वाण निवडा")}</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety} value={variety}>{t(variety)}</option>)}</select><label htmlFor={"size-" + product.id}>{t("बॅगचे वजन")}</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} {t("किलो")}</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>{t("किंमत लवकरच")}</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा"  : t("किंमत बाकी")}</button></div></div></article>)}</div>
+        {productsLoading ? <p role="status" className="muted">उत्पादने लोड होत आहेत...</p> : productsError ? <p role="alert" className="muted">{productsError} कृपया Refresh करा.</p> : products.length === 0 ? <p className="muted">सध्या कोणतीही उत्पादने उपलब्ध नाहीत.</p> : <div className="product-grid">{products.map((product) => <article className="product-card" key={product.id}><div className={"product-visual visual-" + product.id}><img className="product-photo" src={productImage(product)} alt={product.english + " grain"} loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; const fallback = event.currentTarget.parentElement?.querySelector(".product-emoji-fallback") as HTMLElement | null; if (fallback) fallback.style.display = "block"; }} /><span className="product-emoji product-emoji-fallback">{product.emoji}</span><span className="quality-tag">{t("निवडक धान्य")}</span></div><div className="product-content"><div className="product-title"><div><h3>{language === "en" ? product.english : language === "hi" ? t(product.name) : product.name}</h3><span>{product.english}</span></div><div className="price">{product.pricePerKg > 0 ? <><strong>₹{product.pricePerKg}</strong><small>/ किलो</small></> : <small>{t("किंमत निश्चित करायची")}</small>}</div></div><p className="product-note">{t(product.note)}</p><label htmlFor={"variety-" + product.id}>{t("वाण निवडा")}</label><select id={"variety-" + product.id} value={selected[product.id]} onChange={(e) => setSelected({ ...selected, [product.id]: e.target.value })}>{product.varieties.map((variety) => <option key={variety} value={variety}>{t(variety)}</option>)}</select><label htmlFor={"size-" + product.id}>{t("बॅगचे वजन")}</label><select id={"size-" + product.id} value={sizes[product.id]} onChange={(e) => setSizes({ ...sizes, [product.id]: Number(e.target.value) })}>{bagSizes.map((size) => <option key={size} value={size}>{size} {t("किलो")}</option>)}</select><div className="card-footer"><span>{product.pricePerKg > 0 ? <>₹{product.pricePerKg * (sizes[product.id] || 5)} <small>/ बॅग</small></> : <small>{t("किंमत लवकरच")}</small>}</span><button className="add-button" disabled={product.pricePerKg <= 0} onClick={() => addToBasket(product)}>{product.pricePerKg > 0 ? "＋ जोडा"  : t("किंमत बाकी")}</button></div></div></article>)}</div>}
       </section>
 
       <section className="basket-section" id="basket"><div className="container basket-layout"><div><span className="eyebrow">{t("तुमची खरेदी")}</span><h2>{t("तुमची बास्केट")}</h2><p className="muted">{t("बॅगची संख्या + / − करून बदलू शकता.")}</p>{basket.length === 0 ? <div className="empty-basket"><span>🧺</span><strong>{t("तुमची बास्केट रिकामी आहे")}</strong><p>{t("आवडते धान्य निवडून बास्केटमध्ये जोडा.")}</p><a href="#products">{t("धान्य पाहा")} →</a></div> : <div className="basket-items">{basket.map((item) => <div className="basket-item" key={item.key}><div className="mini-grain">{item.product.emoji}</div><div className="basket-item-info"><strong>{language === "en" ? item.product.english : language === "hi" ? t(item.product.name) : item.product.name} — {item.variety}</strong><small>{item.bagSize} किलो बॅग · ₹{item.product.pricePerKg}/किलो</small><b>₹{item.bagSize * item.bags * item.product.pricePerKg}</b></div><div className="stepper"><button aria-label={t("कमी करा")} onClick={() => changeBags(item.key, -1)}>−</button><span>{item.bags}</span><button aria-label={t("वाढवा")} onClick={() => changeBags(item.key, 1)}>＋</button></div></div>)}</div>}</div>
