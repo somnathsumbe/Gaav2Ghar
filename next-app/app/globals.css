@@ -198,4 +198,38 @@ body{background:#fbfaf6;color:var(--ink);font-family:"DM Sans","Noto Sans Devana
 .benefits{padding:12px 0}.benefit-grid{border-radius:15px;padding:12px 9px;gap:6px}.benefit-grid>div{gap:5px;align-items:center}.benefit-grid>div>span{width:31px;height:31px;border-radius:10px;font-size:14px}.benefit-grid strong{font-size:9px}.benefit-grid small{font-size:8px}
 .section{padding-top:30px;padding-bottom:35px}.section-heading{align-items:flex-end;margin-bottom:16px}.section-heading h2{font-size:23px;line-height:1.35}.section-heading p{font-size:10px}.product-count{font-size:9px;padding:6px 8px;white-space:nowrap}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product-card{border-radius:14px}.product-visual{height:130px;min-height:130px}.quality-tag{top:7px;left:7px;padding:5px 7px;font-size:8px}.product-content{padding:10px}.product-title{align-items:flex-start;gap:5px}.product-title h3{font-size:14px}.product-title>div>span{font-size:9px}.price strong{font-size:15px}.price small{font-size:9px}.product-note{font-size:9px;min-height:28px;margin:7px 0}.product-content label{font-size:9px;margin:7px 0 4px}.product-content select{padding:8px 6px;border-radius:8px;font-size:10px}.card-footer{padding-top:9px;margin-top:10px}.card-footer>span{font-size:10px}.add-button{padding:8px 9px;font-size:10px;border-radius:8px}
 .basket-section{padding:30px 0 112px}.basket-layout{grid-template-columns:1fr;gap:15px}.summary-card{padding:16px;border-radius:16px}.footer{padding:30px 0 92px}.footer-grid{gap:20px}.mobile-bottom-nav{display:flex;position:fixed;z-index:45;left:10px;right:10px;bottom:10px;height:60px;padding:5px 8px;border:1px solid #e6eadf;border-radius:18px;background:#fffffff5;backdrop-filter:blur(14px);box-shadow:0 10px 35px #18341f24;justify-content:space-around}.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;color:#7b8377;font-size:18px}.mobile-nav-item small{font-size:9px;font-weight:700}.mobile-nav-item.active{color:var(--green)}.mobile-cart-dock{bottom:82px;left:10px;right:10px;border-radius:15px;box-shadow:0 8px 28px #18341f2e}}
-\n/* Keep disabled price actions legible while clearly indicating that the price is pending. */\n.add-button:disabled{color:#fff!important;background:#214f35!important;opacity:1;cursor:not-allowed;box-shadow:none}\n
+\n/* Keep disabled price actions legible while clearly indicating that the price is pending. */\n.add-button:disabled{color:#fff!important;background:#214f35!important;opacity:1;cursor:not-allowed;box-shadow:none}
+
+/* Green buttons with high-contrast white labels */
+.add-button,
+.primary-button,
+.banner-cta,
+.full-button {
+  background: #214f35 !important;
+  color: #ffffff !important;
+  border-color: #214f35 !important;
+  font-weight: 700;
+}
+.add-button:hover,
+.primary-button:hover,
+.banner-cta:hover,
+.full-button:hover {
+  background: #173a29 !important;
+  border-color: #173a29 !important;
+  color: #ffffff !important;
+}
+.add-button:focus-visible,
+.primary-button:focus-visible,
+.banner-cta:focus-visible,
+.full-button:focus-visible {
+  outline: 3px solid #a9c9a9;
+  outline-offset: 2px;
+}
+.add-button:disabled,
+.primary-button:disabled,
+.full-button:disabled {
+  background: #214f35 !important;
+  color: #ffffff !important;
+  opacity: 1;
+  cursor: not-allowed;
+}
