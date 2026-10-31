@@ -20,7 +20,7 @@ type OrderPayload = {
 
 function validOrder(body: OrderPayload) {
   const customer = body.customer;
-  if (!customer?.name?.trim() || !customer.phone || !/^[6-9]\d{9}$/.test(customer.phone) || !customer.address?.trim()) return false;
+  if (!customer?.name?.trim() || !customer.phone || !/^[6-9]\d{9}$/.test(customer.phone) || !customer.address?.trim() || !customer.pinCode || !/^[1-9][0-9]{5}$/.test(customer.pinCode)) return false;
   if (customer.whatsappOptIn !== undefined && typeof customer.whatsappOptIn !== "boolean") return false;
   if (customer.location !== undefined && customer.location !== null) {
     const { latitude, longitude, accuracy } = customer.location;
