@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { getDatabase } from "@/lib/mongodb";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,11 +13,8 @@ export async function GET() {
     );
   }
 
-  let client: MongoClient | undefined;
   try {
-    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
+    const db = await getDatabase();
     await db.command({ ping: 1 });
     const ordersCollectionExists = await db
       .listCollections({ name: "orders" }, { nameOnly: true })
@@ -34,7 +31,5 @@ export async function GET() {
       { ok: false, databaseConnected: false, error: "MongoDB connection check failed." },
       { status: 503 }
     );
-  } finally {
-    await client?.close();
   }
 }

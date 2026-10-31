@@ -47,7 +47,7 @@ export default function Home() {
   useEffect(() => {
     let active = true;
     setProductsLoading(true);
-    fetch("/api/products", { cache: "no-store", headers: { "Cache-Control": "no-cache" } }).then(async (response) => {
+    fetch("/api/products", { cache: "default" }).then(async (response) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "उत्पादने लोड झाली नाहीत.");
       if (active && Array.isArray(data.products)) {

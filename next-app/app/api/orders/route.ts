@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { getDatabase } from "@/lib/mongodb";
 
 export const runtime = "nodejs";
 
@@ -50,17 +50,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "डेटाबेस कनेक्शन उपलब्ध नाही. ऑर्डर सेव्ह झाली नाही; कृपया नंतर पुन्हा प्रयत्न करा." }, { status: 503 });
   }
 
-  let client: MongoClient | undefined;
   try {
-    client = new MongoClient(uri);
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
+    const db = await getDatabase();
     await db.collection("orders").insertOne(order);
     return NextResponse.json({ ok: true, orderId, persisted: true }, { status: 201 });
   } catch (error) {
     console.error("Order persistence failed", error);
     return NextResponse.json({ error: "ऑर्डर डेटाबेसमध्ये सेव्ह झाली नाही. कृपया पुन्हा प्रयत्न करा." }, { status: 503 });
-  } finally {
-    await client?.close();
   }
 }

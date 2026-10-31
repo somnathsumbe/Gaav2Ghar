@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { getDatabase } from "@/lib/mongodb";
 import { ADMIN_COOKIE_NAME, isAdminConfigured, isValidAdminSession } from "@/lib/admin-auth";
 import { sendWhatsAppStatusUpdate } from "@/lib/whatsapp";
 
@@ -14,26 +14,18 @@ function authorized(request: Request) {
   const cookie = cookieHeader.split(";").map((part) => part.trim()).find((part) => part.startsWith(ADMIN_COOKIE_NAME + "="));
   return isValidAdminSession(cookie ? decodeURIComponent(cookie.slice(ADMIN_COOKIE_NAME.length + 1)) : undefined);
 }
-function databaseUri() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) throw new Error("Database is not configured.");
-  return uri;
-}
-
 export async function GET(request: Request) {
   if (!isAdminConfigured()) return NextResponse.json({ error: "Admin login is not configured." }, { status: 503 });
   if (!authorized(request)) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  let client: MongoClient | undefined;
   try {
-    client = new MongoClient(databaseUri(), { serverSelectionTimeoutMS: 5000 });
-    await client.connect();
-    const orders = await client.db(process.env.MONGODB_DB || "gaav2ghar").collection("orders")
+    const db = await getDatabase();
+    const orders = await db.collection("orders")
       .find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).limit(200).toArray();
     return NextResponse.json({ ok: true, orders });
   } catch (error) {
     console.error("Admin order list failed", error);
     return NextResponse.json({ error: "ऑर्डर्स लोड करता आले नाहीत. Database configuration तपासा." }, { status: 503 });
-  } finally { await client?.close(); }
+  }
 }
 
 export async function PATCH(request: Request) {
@@ -47,11 +39,9 @@ export async function PATCH(request: Request) {
   if (typeof body.status !== "string" || !STATUSES.includes(body.status as (typeof STATUSES)[number]))
     return NextResponse.json({ error: "अवैध order status." }, { status: 400 });
 
-  let client: MongoClient | undefined;
   try {
-    client = new MongoClient(databaseUri(), { serverSelectionTimeoutMS: 5000 });
-    await client.connect();
-    const orders = client.db(process.env.MONGODB_DB || "gaav2ghar").collection("orders");
+    const db = await getDatabase();
+    const orders = db.collection("orders");
     const existing = await orders.findOne({ orderId: body.orderId }, { projection: { _id: 0, orderId: 1, status: 1, customer: 1 } });
     if (!existing) return NextResponse.json({ error: "या order ID ची ऑर्डर सापडली नाही." }, { status: 404 });
     if (existing.status === body.status) return NextResponse.json({ ok: true, orderId: body.orderId, status: body.status, notification: { state: "not_sent", reason: "status_unchanged" } });
@@ -80,5 +70,5 @@ export async function PATCH(request: Request) {
   } catch (error) {
     console.error("Admin order update failed", error);
     return NextResponse.json({ error: "Order status बदलता आला नाही. Database तपासा." }, { status: 503 });
-  } finally { await client?.close(); }
+  }
 }

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { getDatabase } from "@/lib/mongodb";
 import { isAdminConfigured, isValidAdminSession, ADMIN_COOKIE_NAME } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 type ProductSeed = {
   id: string; name: string; english: string; varieties: string[];
@@ -28,30 +27,21 @@ function authorized(request: Request) {
   return isValidAdminSession(part ? decodeURIComponent(part.slice(ADMIN_COOKIE_NAME.length + 1)) : undefined);
 }
 
-async function openDb() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) throw new Error("MONGODB_URI is not configured.");
-  const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
-  await client.connect();
-  return { client, db: client.db(process.env.MONGODB_DB || "gaav2ghar") };
-}
-
 export async function GET() {
-  let client: MongoClient | undefined;
   try {
-    const connection = await openDb();
-    client = connection.client;
+    const db = await getDatabase();
     // Admin catalogue is the source of truth. Do not seed missing products on reads:
     // deleted or never-created products must not reappear in the storefront.
-    const products = await connection.db.collection("products")
+    const products = await db.collection("products")
       .find({ active: { $ne: false } }, { projection: { _id: 0 } })
       .sort({ name: 1 }).toArray();
-    return NextResponse.json({ ok: true, products });
+    return NextResponse.json(
+      { ok: true, products },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } },
+    );
   } catch (error) {
     console.error("Product list failed", error);
     return NextResponse.json({ error: "उत्पादने लोड करता आली नाहीत." }, { status: 503 });
-  } finally {
-    await client?.close();
   }
 }
 
@@ -74,11 +64,9 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "कृपया उत्पादनाचे नाव, English नाव, वाण आणि योग्य किंमत तपासा." }, { status: 400 });
   }
 
-  let client: MongoClient | undefined;
   try {
-    const connection = await openDb();
-    client = connection.client;
-    const result = await connection.db.collection("products").updateOne(
+    const db = await getDatabase();
+    const result = await db.collection("products").updateOne(
       { id },
       { $set: { id, name, english, varieties, pricePerKg, note, emoji, active, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } },
       { upsert: true },
@@ -87,8 +75,6 @@ export async function PATCH(request: Request) {
   } catch (error) {
     console.error("Product save failed", error);
     return NextResponse.json({ error: "उत्पादन सेव्ह करता आले नाही." }, { status: 503 });
-  } finally {
-    await client?.close();
   }
 }
 
@@ -102,17 +88,13 @@ export async function DELETE(request: Request) {
   const id = typeof body.id === "string" ? body.id.trim() : "";
   if (!/^[a-z0-9-]{2,40}$/.test(id)) return NextResponse.json({ error: "अवैध Product ID." }, { status: 400 });
 
-  let client: MongoClient | undefined;
   try {
-    const connection = await openDb();
-    client = connection.client;
-    const result = await connection.db.collection("products").deleteOne({ id });
+    const db = await getDatabase();
+    const result = await db.collection("products").deleteOne({ id });
     if (result.deletedCount === 0) return NextResponse.json({ error: "हे उत्पादन डेटाबेसमध्ये सापडले नाही." }, { status: 404 });
     return NextResponse.json({ ok: true, id, deleted: true });
   } catch (error) {
     console.error("Product delete failed", error);
     return NextResponse.json({ error: "उत्पादन delete करता आले नाही." }, { status: 503 });
-  } finally {
-    await client?.close();
   }
 }
