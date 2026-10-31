@@ -26,9 +26,9 @@ export async function GET(request: Request) {
     await client.connect();
     const db = client.db(process.env.MONGODB_DB || "gaav2ghar");
     const collection = db.collection("orders");
-    const projection = { _id: 0, orderId: 1, status: 1, createdAt: 1, updatedAt: 1, items: 1, total: 1, "customer.name": 1 };
+    const projection = { _id: 0, orderId: 1, status: 1, createdAt: 1, updatedAt: 1, "customer.name": 1 };
 
-    // Order ID lookup always returns only that exact order, including its final status.
+    // An Order ID returns only its matching order and its current/final status.
     if (hasOrderId) {
       const filter = hasPhone
         ? { orderId, "customer.phone": phone }
@@ -38,16 +38,45 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: true, order });
     }
 
-    // Phone lookup lists all non-delivered orders for the registered mobile.
-    const orders = await collection.find(
-      { "customer.phone": phone, status: { $ne: "delivered" } },
-      { projection },
-    ).sort({ createdAt: -1 }).toArray();
+    // Normalize phone values in MongoDB so legacy values with +91, spaces or
+    // punctuation are matched too. Keep every order except delivered ones.
+    const orders = await collection.aggregate([
+      {
+        $addFields: {
+          _trackingPhone: {
+            $regexReplace: {
+              input: {
+                $toString: {
+                  $ifNull: ["$customer.phone", { $ifNull: ["$customer.mobile", "$phone"] }],
+                },
+              },
+              regex: "[^0-9]",
+              replacement: "",
+            },
+          },
+          _trackingStatus: {
+            $toLower: { $ifNull: ["$status", "pending_confirmation"] },
+          },
+        },
+      },
+      { $match: { _trackingPhone: { $regex: phone + "$" }, _trackingStatus: { $ne: "delivered" } } },
+      { $sort: { createdAt: -1 } },
+      {
+        $project: {
+          _id: 0,
+          orderId: 1,
+          status: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          "customer.name": 1,
+        },
+      },
+    ]).toArray();
 
     if (!orders.length) {
       return NextResponse.json({ error: "या मोबाईल नंबरवर कोणतीही सुरू असलेली ऑर्डर सापडली नाही." }, { status: 404 });
     }
-    return NextResponse.json({ ok: true, orders });
+    return NextResponse.json({ ok: true, orders, count: orders.length });
   } catch (error) {
     console.error("Order tracking lookup failed", error);
     return NextResponse.json({ error: "Tracking माहिती मिळवता आली नाही." }, { status: 503 });
