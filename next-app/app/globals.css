@@ -326,3 +326,43 @@ main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight
     min-width: 0;
   }
 }
+
+
+/* Checkout validation and post-order confirmation */
+.checkout-form input:required:invalid,
+.checkout-form textarea:required:invalid { border-color: #d6a29a; }
+.checkout-form input:required:valid,
+.checkout-form textarea:required:valid { border-color: #9bb99a; }
+.order-confirmation-card {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 0 0 8px;
+  padding: 22px;
+  border: 1px solid #cfe0cb;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f2f8ef, #fff);
+  box-shadow: 0 10px 28px #183e2410;
+}
+.confirmation-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #214f35;
+  color: #fff;
+  font-size: 23px;
+  font-weight: 800;
+}
+.order-confirmation-card h3 { margin: 4px 0 10px; color: #173a29; font-size: 21px; }
+.order-confirmation-card p { margin: 7px 0; font-size: 13px; color: #425344; overflow-wrap: anywhere; }
+.order-confirmation-card .confirmation-eyebrow { color: #214f35; font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+.order-confirmation-card a { display: inline-block; margin-top: 8px; color: #214f35; font-size: 13px; font-weight: 800; text-decoration: underline; }
+@media(max-width:650px) {
+  .order-confirmation-card { padding: 16px; gap: 11px; border-radius: 15px; }
+  .confirmation-icon { flex-basis: 36px; width: 36px; height: 36px; font-size: 19px; }
+  .order-confirmation-card h3 { font-size: 18px; }
+}
