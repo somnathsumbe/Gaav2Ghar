@@ -5,6 +5,21 @@ import { useCallback, useEffect, useState } from "react";
 export type AppLanguage = "mr" | "hi" | "en";
 
 const dictionary: Record<string, Record<AppLanguage, string>> = {
+  "गावठी कांदा": { mr: "गावठी कांदा", hi: "देसी प्याज़", en: "Desi Onion" },
+  "लाल कांदा": { mr: "लाल कांदा", hi: "लाल प्याज़", en: "Red Onion" },
+  "लोकवन गहू": { mr: "लोकवन गहू", hi: "लोकवन गेहूँ", en: "Lokwan Wheat" },
+  "बन्सी गहू": { mr: "बन्सी गहू", hi: "बंसी गेहूँ", en: "Bansi Wheat" },
+  "शरबती गहू": { mr: "शरबती गहू", hi: "शरबती गेहूँ", en: "Sharbati Wheat" },
+  "GW 496 गहू": { mr: "GW 496 गहू", hi: "GW 496 गेहूँ", en: "GW 496 Wheat" },
+  "श्रीराम-11 गहू": { mr: "श्रीराम-11 गहू", hi: "श्रीराम-11 गेहूँ", en: "Shriram-11 Wheat" },
+  "मालदांडी ज्वारी": { mr: "मालदांडी ज्वारी", hi: "मालदांडी ज्वार", en: "Maldandi Jowar" },
+  "पायनियर बाजरी*": { mr: "पायनियर बाजरी*", hi: "पायनियर बाजरा*", en: "Pioneer Bajra*" },
+  "68 बाजरी*": { mr: "68 बाजरी*", hi: "68 बाजरा*", en: "68 Bajra*" },
+  "मोहदया बाजरी*": { mr: "मोहदया बाजरी*", hi: "मोहदया बाजरा*", en: "Mohadaya Bajra*" },
+  "हिरवा अख्खा मूग": { mr: "हिरवा अख्खा मूग", hi: "साबुत हरा मूंग", en: "Whole Green Moong" },
+  "पांढरी तूर": { mr: "पांढरी तूर", hi: "सफेद अरहर", en: "White Pigeon Pea" },
+  "तूर": { mr: "तूर", hi: "अरहर", en: "Tur" },
+
   "मराठी": { mr: "मराठी", hi: "मराठी", en: "Marathi" },
   "हिंदी": { mr: "हिंदी", hi: "हिंदी", en: "Hindi" },
   "English": { mr: "English", hi: "English", en: "English" },
