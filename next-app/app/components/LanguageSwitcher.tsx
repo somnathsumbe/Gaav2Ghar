@@ -216,6 +216,19 @@ const dictionary: Record<string, Record<AppLanguage, string>> = {
   "पॅक": { mr: "पॅक", hi: "पैक", en: "packed" },
 
   "ऑर्डर": { mr: "ऑर्डर", hi: "ऑर्डर", en: "Order" },
+  "बॅग": {"mr":"बॅग","hi":"बैग","en":"bag"},
+  "＋ जोडा": {"mr":"＋ जोडा","hi":"＋ जोड़ें","en":"＋ Add"},
+  "उत्पादने लोड होत आहेत...": {"mr":"उत्पादने लोड होत आहेत...","hi":"उत्पाद लोड हो रहे हैं...","en":"Loading products..."},
+  "सध्या कोणतीही उत्पादने उपलब्ध नाहीत.": {"mr":"सध्या कोणतीही उत्पादने उपलब्ध नाहीत.","hi":"फिलहाल कोई उत्पाद उपलब्ध नहीं हैं।","en":"No products are currently available."},
+  "ऑर्डर यशस्वीरीत्या नोंदवली": {"mr":"ऑर्डर यशस्वीरीत्या नोंदवली","hi":"ऑर्डर सफलतापूर्वक दर्ज हुई","en":"Order placed successfully"},
+  "धन्यवाद": {"mr":"धन्यवाद","hi":"धन्यवाद","en":"Thank you"},
+  "मोबाईल नंबर:": {"mr":"मोबाईल नंबर:","hi":"मोबाइल नंबर:","en":"Mobile number:"},
+  "ऑर्डर आयडी:": {"mr":"ऑर्डर आयडी:","hi":"ऑर्डर ID:","en":"Order ID:"},
+  "ही सूचना 5 सेकंदांनी बंद होईल.": {"mr":"ही सूचना 5 सेकंदांनी बंद होईल.","hi":"यह संदेश 5 सेकंड में बंद हो जाएगा।","en":"This message will close in 5 seconds."},
+  "मुख्य नेव्हिगेशन": {"mr":"मुख्य नेव्हिगेशन","hi":"मुख्य नेविगेशन","en":"Main navigation"},
+  "बंद करा": {"mr":"बंद करा","hi":"बंद करें","en":"Close"},
+  "योग्य 10 अंकी मोबाईल नंबर टाका": {"mr":"योग्य 10 अंकी मोबाईल नंबर टाका","hi":"सही 10 अंकों का मोबाइल नंबर दर्ज करें","en":"Enter a valid 10-digit mobile number"},
+  "6 अंकी योग्य पिनकोड टाका": {"mr":"6 अंकी योग्य पिनकोड टाका","hi":"सही 6 अंकों का PIN code दर्ज करें","en":"Enter a valid 6-digit PIN code"},
 };
 
 export function translate(text: string, language: AppLanguage): string {
@@ -225,17 +238,23 @@ export function translate(text: string, language: AppLanguage): string {
 export function useAppLanguage() {
   const [language, setLanguageState] = useState<AppLanguage>("en");
   useEffect(() => {
-    const stored = window.localStorage.getItem("gaav2ghar-language");
-    if (stored === "mr" || stored === "hi" || stored === "en") setLanguageState(stored);
+    const stored = window.localStorage.getItem("gaav2ghar-language-v2");
+    const initialLanguage: AppLanguage = stored === "mr" || stored === "hi" || stored === "en" ? stored : "en";
+    setLanguageState(initialLanguage);
+    document.documentElement.lang = initialLanguage;
     const handle = (event: Event) => {
       const selected = (event as CustomEvent<AppLanguage>).detail;
-      if (selected === "mr" || selected === "hi" || selected === "en") setLanguageState(selected);
+      if (selected === "mr" || selected === "hi" || selected === "en") {
+        setLanguageState(selected);
+        document.documentElement.lang = selected;
+      }
     };
     window.addEventListener("gaav2ghar-language-change", handle);
     return () => window.removeEventListener("gaav2ghar-language-change", handle);
   }, []);
   const setLanguage = useCallback((next: AppLanguage) => {
-    window.localStorage.setItem("gaav2ghar-language", next);
+    window.localStorage.setItem("gaav2ghar-language-v2", next);
+    document.documentElement.lang = next;
     setLanguageState(next);
     window.dispatchEvent(new CustomEvent("gaav2ghar-language-change", { detail: next }));
   }, []);
