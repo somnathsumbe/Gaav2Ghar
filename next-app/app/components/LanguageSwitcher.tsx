@@ -176,8 +176,6 @@ const dictionary: Record<string, Record<AppLanguage, string>> = {
   "कांदा": { mr: "कांदा", hi: "प्याज़", en: "Onion" },
   "बाजरी": { mr: "बाजरी", hi: "बाजरा", en: "Bajra" },
   "मूग": { mr: "मूग", hi: "मूंग", en: "Moong" },
-  "गावठी कांदा": { mr: "गावठी कांदा", hi: "देसी प्याज़", en: "Local onion" },
-  "लाल कांदा": { mr: "लाल कांदा", hi: "लाल प्याज़", en: "Red onion" },
   "लोकवन": { mr: "लोकवन", hi: "लोकवन", en: "Lokwan" },
   "बन्सी": { mr: "बन्सी", hi: "बंसी", en: "Bansi" },
   "शरबती": { mr: "शरबती", hi: "शरबती", en: "Sharbati" },
