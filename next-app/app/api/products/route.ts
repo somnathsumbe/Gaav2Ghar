@@ -11,10 +11,11 @@ type ProductSeed = {
 };
 
 const seedProducts: ProductSeed[] = [
-  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "शरबती", "बन्सी"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾", active: true },
-  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी ज्वारी", "मालदांडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱", active: true },
-  { id: "bajri", name: "बाजरी", english: "Bajri", varieties: ["पांढरी बाजरी", "करडी बाजरी"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
-  { id: "onion", name: "कांदे", english: "Onions", varieties: ["लाल कांदे"], pricePerKg: 0, note: "गावाकडचे कांदे", emoji: "🧅", active: true },
+  { id: "onion", name: "कांदा", english: "Onion", varieties: ["गावठी कांदा", "लाल कांदा"], pricePerKg: 0, note: "गावाकडचे ताजे कांदे", emoji: "🧅", active: true },
+  { id: "wheat", name: "गहू", english: "Wheat", varieties: ["लोकवन", "बन्सी", "शरबती"], pricePerKg: 42, note: "दैनंदिन पोळ्यांसाठी", emoji: "🌾", active: true },
+  { id: "jowar", name: "ज्वारी", english: "Jowar", varieties: ["पांढरी", "मालदांडी", "दगडी"], pricePerKg: 48, note: "पारंपरिक आणि पौष्टिक", emoji: "🌱", active: true },
+  { id: "bajri", name: "बाजरी", english: "Bajra", varieties: ["देशी", "हायब्रीड", "मोठ्या दाण्याची", "बारीक दाण्याची"], pricePerKg: 0, note: "पारंपरिक बाजरी", emoji: "🌾", active: true },
+  { id: "moong", name: "मूग", english: "Moong", varieties: ["बारीक दाणा", "मोठा दाणा"], pricePerKg: 0, note: "निवडक मूग", emoji: "🫘", active: true },
 ];
 
 function authorized(request: Request) {
@@ -39,9 +40,9 @@ export async function GET() {
     client = connection.client;
     const collection = connection.db.collection("products");
     // Keep only the products currently offered in the storefront. Mark legacy records inactive so they disappear from customer and admin product lists without deleting order history.
-    await collection.updateMany({ id: { $in: ["rice", "moong", "toor-dal"] } }, { $set: { active: false, updatedAt: new Date() } });
+    await collection.updateMany({ id: { $in: ["rice", "toor-dal"] } }, { $set: { active: false, updatedAt: new Date() } });
     await collection.bulkWrite(seedProducts.map((product) => ({
-      updateOne: { filter: { id: product.id }, update: { $setOnInsert: { ...product, createdAt: new Date(), updatedAt: new Date() } }, upsert: true },
+      updateOne: { filter: { id: product.id }, update: { $set: { name: product.name, english: product.english, varieties: product.varieties, note: product.note, emoji: product.emoji, active: true, updatedAt: new Date() }, $setOnInsert: { ...product, createdAt: new Date() } }, upsert: true },
     })));
     const products = await collection.find({ active: { $ne: false } }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
     return NextResponse.json({ ok: true, products });
