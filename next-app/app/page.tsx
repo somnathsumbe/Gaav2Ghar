@@ -163,6 +163,12 @@ export default function Home() {
         <div className="container header-inner">
           <a className="brand" href="#" aria-label="Gaav2Ghar home"><img className="brand-logo" src="/logo.avif" alt="Gaav2Ghar logo" /></a>
           <nav className="header-actions" aria-label={t("मुख्य नेव्हिगेशन")}>
+            <div className="desktop-nav-links">
+              <a href="#home">{t("मुख्य पान")}</a>
+              <a href="#products">{t("धान्य सूची")}</a>
+              <a href="#basket">{t("बास्केट")}</a>
+              <a href="#contact">{t("संपर्क")}</a>
+            </div>
             <LanguageSwitcher />
             <a className="basket-link header-icon-only" href="#basket" aria-label={t("बास्केट उघडा")} title={t("बास्केट उघडा")}>
               <svg className="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M8 13l1 4m7-4-1 4M12 13v4"/></svg>
@@ -206,9 +212,9 @@ export default function Home() {
       <section className="section container store-selection" id="products">
         <div className="store-selection-heading">
           <div><span className="store-eyebrow">{t("आमची निवड")}</span><h2>{t("घरासाठी चांगले धान्य")}</h2><p>{t("वाण आणि बॅगचे वजन निवडा, मग बास्केटमध्ये जोडा.")}</p></div>
-          <span className="store-product-count">{products.length} {t("उत्पादने")}</span>
+          <span className="store-product-count">{productsLoading ? t("लोड होत आहे...") : products.length + " " + t("उत्पादने")}</span>
         </div>
-        {productsLoading ? <p role="status" className="muted">{t("उत्पादने लोड होत आहेत...")}</p> : productsError ? <p role="alert" className="muted">{productsError} कृपया Refresh करा.</p> : products.length === 0 ? <p className="muted">{t("सध्या कोणतीही उत्पादने उपलब्ध नाहीत.")}</p> : <div className="store-product-grid">{products.map((product) => <article className="store-product-card" key={product.id}>
+        {productsLoading ? <div className="store-product-grid store-skeleton-grid" role="status" aria-label={t("उत्पादने लोड होत आहेत")}><span className="visually-hidden">{t("उत्पादने लोड होत आहेत...")}</span>{Array.from({ length: 6 }, (_, index) => <div className="store-product-skeleton" key={index}><div className="skeleton-photo" /><div className="skeleton-lines"><i /><i /><i /><b /></div></div>)}</div> : productsError ? <div className="store-load-error" role="alert"><p>{productsError}</p><button type="button" onClick={() => window.location.reload()}>{t("पुन्हा प्रयत्न करा")}</button></div> : products.length === 0 ? <p className="muted">{t("सध्या कोणतीही उत्पादने उपलब्ध नाहीत.")}</p> : <div className="store-product-grid">{products.map((product) => <article className="store-product-card" key={product.id}>
           <div className={"store-product-visual visual-" + product.id}>
             <img className="store-product-photo" src={productImage(product)} alt={product.english + " grain"} loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; const fallback = event.currentTarget.parentElement?.querySelector(".store-product-fallback") as HTMLElement | null; if (fallback) fallback.style.display = "block"; }} />
             <span className="store-product-fallback" aria-hidden="true">{product.emoji}</span>
