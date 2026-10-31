@@ -206,14 +206,16 @@ export default function AdminPage() {
                         <h2>{order.orderId}</h2>
                         <p className="detail"><strong>{t("ग्राहक:")}</strong> {order.customer?.name || "—"}</p>
                         <p className="detail"><strong>मोबाईल:</strong> {order.customer?.phone || "—"}</p>
-                        <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>\n                        <p className="detail"><strong>PIN Code:</strong> {order.customer?.pinCode || "—"}</p>
+                        <p className="detail"><strong>{t("पत्ता:")}</strong> {order.customer?.address || "—"}</p>
+                        <p className="detail"><strong>PIN Code:</strong> {order.customer?.pinCode || "—"}</p>
                         <p className="detail"><strong>{t("ऑर्डर वेळ:")}</strong> {date(order.createdAt)}</p>
                         <ul className="items">{(order.items || []).map((item, index) => <li key={index}>{item.product || "धान्य"} — {item.variety || "—"}; {item.bagSizeKg || 0} किलो × {item.bags || 0} बॅग = {item.quantityKg || (Number(item.bagSizeKg) * Number(item.bags)) || 0} किलो</li>)}</ul>
                         <p className="detail">Payment: {order.paymentMethod || "COD"} • Delivery: {money(order.deliveryCharge)}</p>
                         <p className="total">एकूण: {money(order.total)}</p>
                       </div>
                       <div>
-                        <button type="button" className="secondary" style={{ width: "100%", marginBottom: 12 }} onClick={() => printInvoice(order)}>🧾 Generate / Print Bill</button>\n                        <label htmlFor={"status-" + order.orderId}>Order Status / {t("सध्याची स्थिती:")}</label>
+                        <button type="button" className="secondary" style={{ width: "100%", marginBottom: 12 }} onClick={() => printInvoice(order)}>🧾 Generate / Print Bill</button>
+                        <label htmlFor={"status-" + order.orderId}>Order Status / {t("सध्याची स्थिती:")}</label>
                         <select id={"status-" + order.orderId} value={order.status || "pending_confirmation"} onChange={(event) => void updateStatus(order.orderId, event.target.value)}>{statuses.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
                         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Status बदलल्यावर database मध्ये save होईल.</p>
                       </div>
