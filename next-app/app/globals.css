@@ -273,3 +273,56 @@ main.container-fluid:has(a[href="/admin"]) button{border-radius:10px;font-weight
   .product-emoji-fallback{display:none;}
   .brand-logo{display:block!important;max-width:150px!important;height:46px!important;object-fit:contain!important;}
 }
+
+
+/* Mobile storefront image visibility: use the existing public assets in a stable card layout. */
+@media (max-width: 640px) {
+  #products .product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
+    gap: 12px !important;
+  }
+  #products .product-card {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  #products .product-visual {
+    display: block !important;
+    position: relative !important;
+    flex: 0 0 150px !important;
+    width: 100% !important;
+    height: 150px !important;
+    min-height: 150px !important;
+    max-height: 150px !important;
+    overflow: hidden !important;
+    background: #f1f0e7;
+  }
+  #products .product-photo {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 0;
+  }
+  #products .product-visual .quality-tag {
+    z-index: 2;
+  }
+  #products .product-visual .product-emoji-fallback {
+    z-index: 1;
+  }
+  #products .product-content {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
